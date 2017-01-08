@@ -7,13 +7,28 @@ import (
 
 func Commands(meta *command.Meta) map[string]cli.CommandFactory {
 	return map[string]cli.CommandFactory{
-		"search": func() (cli.Command, error) {
-			return &command.SearchCommand{
+		"import": func() (cli.Command, error) {
+			return &command.ImportCommand{
 				Meta: *meta,
 			}, nil
 		},
-		"import": func() (cli.Command, error) {
-			return &command.ImportCommand{
+		"list": func() (cli.Command, error) {
+			return &command.ListCommand{
+				Meta: *meta,
+			}, nil
+		},
+		"show": func() (cli.Command, error) {
+			return &command.ShowCommand{
+				Meta: *meta,
+			}, nil
+		},
+		"open": func() (cli.Command, error) {
+			return &command.OpenCommand{
+				Meta: *meta,
+			}, nil
+		},
+		"download": func() (cli.Command, error) {
+			return &command.DownloadCommand{
 				Meta: *meta,
 			}, nil
 		},
