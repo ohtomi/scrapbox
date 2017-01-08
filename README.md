@@ -11,10 +11,10 @@ $ scrapbox import ohtomi bookmark
 Imported keyword data from https://scrapbox.io/ohtomi to ~/.go-scrapbox/scrapbox.io/ohtomi/bookmark/db/
 
 $ scrapbox list ohtomi bookmark
-Go Advent Calendar 2016 - Qiita #Go #adventcalendar #Qiita #Bookmark
-Go (その2) Advent Calendar 2016 - Qiita #Go #adventcalendar #Qiita #Bookmark
-Go (その3) Advent Calendar 2016 - Qiita #Go #adventcalendar #Qiita #Bookmark
-高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA #gcli #Go #generator #Bookmark
+Go Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
+Go (その2) Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
+Go (その3) Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
+高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA --- #gcli #Go #generator #Bookmark
 ...
 
 $ scrapbox show ohtomi "高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA"
@@ -34,31 +34,36 @@ $ ls .
 $ scrapbox upload ohtomi "./高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA"
 ```
 
-### Local Cache
+### Environment Variables
+
+- `SCRAPBOX_TOKEN`: specify `token` instead of `--token` option.
+- `SCRAPBOX_URL`: specify `url` instead of `--url` option.
+
+### Local Cache Control
 
 ```bash
-$ scrapbox show --no-cache project-name page-name
-$ scrapbox open --no-cache project-name page-name
+$ scrapbox show --no-cache PROJECT PAGE
+$ scrapbox open --no-cache PROJECT PAGE
 ```
 
 ### Private Project
 
 ```bash
-$ scrapbox import   --token "your token" project-name tag-name
-$ scrapbox show     --token "your token" project-name page-name
-$ scrapbox download --token "your token" project-name page-name /path/to/
-$ scrapbox upload   --token "your token" project-name /path/to/page-name
+$ scrapbox import   --token "your token" PROJECT TAG
+$ scrapbox show     --token "your token" PROJECT PAGE
+$ scrapbox download --token "your token" PROJECT PAGE /path/to/
+$ scrapbox upload   --token "your token" PROJECT /path/to/PAGE
 ```
 
 ### Scrapbox Enterprise
 
 ```bash
-$ scrapbox import   --url http://host:port/ project-name tag-name
-$ scrapbox list     --url http://host:port/ project-name tag-name
-$ scrapbox show     --url http://host:port/ project-name page-name
-$ scrapbox open     --url http://host:port/ project-name page-name
-$ scrapbox download --url http://host:port/ project-name page-name /path/to/
-$ scrapbox upload   --url http://host:port/ project-name /path/to/page-name
+$ scrapbox import   --url http://host:port/ PROJECT TAG
+$ scrapbox list     --url http://host:port/ PROJECT TAG
+$ scrapbox show     --url http://host:port/ PROJECT PAGE
+$ scrapbox open     --url http://host:port/ PROJECT PAGE
+$ scrapbox download --url http://host:port/ PROJECT PAGE /path/to/
+$ scrapbox upload   --url http://host:port/ PROJECT /path/to/PAGE
 ```
 
 ## Install
