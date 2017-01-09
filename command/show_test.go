@@ -1,11 +1,39 @@
 package command
 
 import (
+	"bytes"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
 	"testing"
 
-	"github.com/mitchellh/cli"
+	_ "github.com/mitchellh/cli"
 )
 
 func TestShowCommand_implement(t *testing.T) {
-	var _ cli.Command = &ShowCommand{}
+	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
+	meta := newTestMeta(outStream, errStream, inStream)
+	command := &ShowCommand{
+		Meta: *meta,
+	}
+
+	muxAPI := http.NewServeMux()
+	testAPIServer := httptest.NewServer(muxAPI)
+	defer testAPIServer.Close()
+
+	muxAPI.HandleFunc("/api/pages/Bookmark", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "../testdata/localhost/ohtomi/bookmark/response/Bookmark.json")
+	})
+
+	args := strings.Split("--url "+testAPIServer.URL+" ohtomi Bookmark", " ")
+	exitStatus := command.Run(args)
+	if exitStatus != 0 {
+		t.Fatalf("ExitStatus=%d, but want %d", exitStatus, 0)
+	}
+
+	expected := fmt.Sprintf("Bookmark")
+	if !strings.Contains(outStream.String(), expected) {
+		t.Fatalf("Output=%q, but want %q", outStream.String(), expected)
+	}
 }

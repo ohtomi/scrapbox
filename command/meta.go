@@ -6,3 +6,16 @@ import "github.com/mitchellh/cli"
 type Meta struct {
 	Ui cli.Ui
 }
+
+const (
+	defaultURL = "https://scrapbox.io"
+)
+
+const (
+	apiEndpoint = "api/pages"
+)
+
+const (
+	EnvScrapboxToken = "SCRAPBOX_TOKEN"
+	EnvScrapboxURL   = "SCRAPBOX_URL"
+)
