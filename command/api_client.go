@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 )
 
 const (
@@ -32,6 +33,7 @@ func NewClient(url *url.URL, token string) (*Client, error) {
 }
 
 func (c *Client) newRequest(ctx context.Context, method, spath string, body io.Reader) (*http.Request, error) {
+
 	u := *c.URL
 	u.Path = path.Join(c.URL.Path, spath)
 
@@ -65,6 +67,7 @@ type Page struct {
 }
 
 func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
+
 	spath := fmt.Sprintf("%s/%s/%s", apiEndpoint, project, page)
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
@@ -106,4 +109,34 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 		Links:             links,
 		RelatedPageTitles: relatedPageTitles,
 	}, nil
+}
+
+func (p *Page) TagList() string {
+	var tagList = ""
+	for _, l := range p.Links {
+		tagList = fmt.Sprintf("%s #%s", tagList, l)
+	}
+	return strings.TrimSpace(tagList)
+}
+
+func (p *Page) FirstURL() string {
+
+	keywords := []string{"http://", "https://"}
+	whitespace := " "
+
+	for _, line := range p.Lines {
+		for _, k := range keywords {
+			if strings.Contains(line, k) {
+				if strings.Index(line, k) != -1 {
+					line = line[strings.Index(line, k):]
+				}
+				if strings.Index(line, whitespace) != -1 {
+					line = line[:strings.Index(line, whitespace)]
+				}
+				return line
+			}
+		}
+	}
+
+	return ""
 }

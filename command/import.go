@@ -23,25 +23,20 @@ func fetchRelatedPageTitlesByTag(host, project, tag string, client *Client) ([]s
 	return p.RelatedPageTitles, nil
 }
 
-func fetchTagListByRelatedPageTitle(host, project, relatedPageTitle string, client *Client) (string, error) {
+func fetchTagListAndFirstURLByTitle(host, project, relatedPage string, client *Client) (string, string, error) {
 
-	p, err := client.GetPage(context.Background(), project, relatedPageTitle)
+	p, err := client.GetPage(context.Background(), project, relatedPage)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	var tagList = ""
-	for _, l := range p.Links {
-		tagList = fmt.Sprintf("%s #%s", tagList, l)
-	}
-
-	return strings.TrimSpace(tagList), nil
+	return p.TagList(), p.FirstURL(), nil
 }
 
-func writeRelatedPage(host, project, page, relatedPageTitle, tagList string) error {
+func writeRelatedPage(host, project, tag, relatedPage, tagList, firstURL string) error {
 
-	statement := "insert into related_page(host, project, page, related_page, tag_list) values(?, ?, ?, ?, ?);"
-	parameters := []interface{}{host, project, page, relatedPageTitle, tagList}
+	statement := "insert into related_page(host, project, page, related_page, tag_list, first_url) values(?, ?, ?, ?, ?, ?);"
+	parameters := []interface{}{host, project, tag, relatedPage, tagList, firstURL}
 	if err := execSQL(statement, parameters); err != nil {
 		return err
 	}
@@ -133,12 +128,12 @@ func (c *ImportCommand) Run(args []string) int {
 	}
 
 	for _, t := range titles {
-		tagList, err := fetchTagListByRelatedPageTitle(host, project, t, client)
+		tagList, firstURL, err := fetchTagListAndFirstURLByTitle(host, project, t, client)
 		if err != nil {
 			c.Ui.Error(fmt.Sprintf("failed to fetch tag list: %s", err))
 			continue
 		}
-		if err := writeRelatedPage(host, project, tag, t, tagList); err != nil {
+		if err := writeRelatedPage(host, project, tag, t, tagList, firstURL); err != nil {
 			c.Ui.Error(fmt.Sprintf("failed to write related page: %s", err))
 			return ExitCodeWriteRelatedPageFailure
 		}
