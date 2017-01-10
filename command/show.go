@@ -3,11 +3,18 @@ package command
 import (
 	"bufio"
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"net/url"
 	"os"
+	"path"
 	"strings"
+	"time"
+)
+
+const (
+	cacheExpiration = 60 * 60 * 24
 )
 
 type ShowCommand struct {
@@ -16,16 +23,38 @@ type ShowCommand struct {
 
 func hasValidLocalCache(host, project, page string) bool {
 
-	// TODO check file timestamp
-	return false
+	var cachedAt int64 = 0
+
+	statement := "select cached_at from local_cache where host = ? and project = ? and page = ?"
+	parameters := []interface{}{host, project, page}
+	handler := func(rows *sql.Rows) error {
+		for rows.Next() {
+			if err := rows.Scan(&cachedAt); err != nil {
+				return err
+			}
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err := querySQL(statement, parameters, handler)
+	if err != nil {
+		return false
+	}
+
+	diff := time.Now().Unix() - cachedAt
+	return diff <= int64(cacheExpiration)
 }
 
 func readLocalCache(host, project, page string) ([]string, error) {
 
 	var lines []string
 
-	// TODO local cache file - path, name
-	filepath := os.Getenv("HOME") + "/.scrapbox/" + host + "_" + page
+	directory := path.Join(scrapboxHome, "page", host, project)
+	filepath := path.Join(directory, page)
+
 	fin, err := os.Open(filepath)
 	if err != nil {
 		return nil, err
@@ -45,20 +74,44 @@ func readLocalCache(host, project, page string) ([]string, error) {
 
 func writeLocalCache(host, project, page string, lines []string) error {
 
-	// TODO local cache file - path, name
-	filepath := os.Getenv("HOME") + "/.scrapbox/" + host + "_" + page
-	// TODO create directory if not exists
+	statement := "insert or replace into local_cache(host, project, page, cached_at) values(?, ?, ?, ?)"
+	parameters := []interface{}{host, project, page, time.Now().Unix()}
+	if err := execSQL(statement, parameters); err != nil {
+		return err
+	}
+
+	directory := path.Join(scrapboxHome, "page", host, project)
+	filepath := path.Join(directory, page)
+
+	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
+		return err
+	}
 	fout, err := os.Create(filepath)
 	if err != nil {
 		return err
 	}
 	defer fout.Close()
 
-	for _, l := range lines {
-		fout.WriteString(l)
+	for _, line := range lines {
+		fout.WriteString(line)
 	}
 
 	return nil
+}
+
+func fetchPageContent(host, project, page, token string, parsedURL *url.URL) ([]string, error) {
+
+	client, err := NewClient(parsedURL, token)
+	if err != nil {
+		return nil, err
+	}
+
+	p, err := client.GetPage(context.Background(), page)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.Lines, nil
 }
 
 func (c *ShowCommand) Run(args []string) int {
@@ -84,70 +137,59 @@ func (c *ShowCommand) Run(args []string) int {
 	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
 
 	if err := flags.Parse(args); err != nil {
-		return 1
+		return ExitCodeParseFlagsError
 	}
 
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
 		c.Ui.Error("you must set PROJECT and PAGE name.")
-		return 1
+		return ExitCodeBadArgs
 	}
 	project, page = parsedArgs[0], parsedArgs[1]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT name.")
-		return 1
+		return ExitCodeProjectNotFound
 	}
 	if len(page) == 0 {
-		c.Ui.Error("missing TAG name.")
-		return 1
+		c.Ui.Error("missing PAGE name.")
+		return ExitCodePageNotFound
 	}
 
 	if len(baseURL) == 0 {
 		baseURL = defaultURL
 	}
 
-	u, err := url.ParseRequestURI(baseURL)
+	parsedURL, err := url.ParseRequestURI(baseURL)
 	if err != nil {
 		c.Ui.Error("failed to parse url: " + baseURL)
-		return 1
+		return ExitCodeInvalidURL
 	}
-	host = u.Host
+	host = c.Meta.TrimPortFromHost(parsedURL.Host)
 
-	if hasValidLocalCache(host, project, page) {
-		lines, err := readLocalCache(host, project, page)
+	// process
+
+	if !hasValidLocalCache(host, project, page) {
+		lines, err := fetchPageContent(host, project, page, token, parsedURL)
 		if err != nil {
-			c.Ui.Error(fmt.Sprintf("failed to read local cache: %s", err))
-			return 1
+			c.Ui.Error(fmt.Sprintf("failed to fetch page: %s", err))
+			return ExitCodeFetchFailure
 		}
-		for _, l := range lines {
-			c.Ui.Output(l)
+		if err := writeLocalCache(host, project, page, lines); err != nil {
+			c.Ui.Error(fmt.Sprintf("failed to write local cache: %s", err))
+			return ExitCodeWriteCacheFailure
 		}
-		return 0
 	}
 
-	client, err := NewClient(u, token)
+	lines, err := readLocalCache(host, project, page)
 	if err != nil {
-		c.Ui.Error(fmt.Sprintf("failed to initialize http client: %s", err))
+		c.Ui.Error(fmt.Sprintf("failed to read local cache: %s", err))
+		return ExitCodeReadCacheFailure
 	}
-
-	p, err := client.GetPage(context.Background(), page)
-	if err != nil {
-		c.Ui.Error(fmt.Sprintf("failed to get page: %s", err))
-		return 1
+	for _, line := range lines {
+		c.Ui.Output(line)
 	}
-
-	err = writeLocalCache(host, project, page, p.Lines)
-	if err != nil {
-		c.Ui.Error(fmt.Sprintf("failed to write local cache: %s", err))
-		return 1
-	}
-
-	for _, l := range p.Lines {
-		c.Ui.Output(l)
-	}
-
-	return 0
+	return ExitCodeOK
 }
 
 func (c *ShowCommand) Synopsis() string {
@@ -155,7 +197,7 @@ func (c *ShowCommand) Synopsis() string {
 }
 
 func (c *ShowCommand) Help() string {
-	helpText := `usage: scrapbox show [options...] PROJECT TAG
+	helpText := `usage: scrapbox show [options...] PROJECT PAGE
 
 Options:
   --token, -t  Scrapbox connect.sid which is used to access private project.

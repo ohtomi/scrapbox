@@ -23,13 +23,13 @@ func TestShowCommand_implement(t *testing.T) {
 	defer testAPIServer.Close()
 
 	muxAPI.HandleFunc("/api/pages/Bookmark", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "../testdata/localhost/ohtomi/bookmark/response/Bookmark.json")
+		http.ServeFile(w, r, "../testdata/Bookmark.json")
 	})
 
 	args := strings.Split("--url "+testAPIServer.URL+" ohtomi Bookmark", " ")
 	exitStatus := command.Run(args)
-	if exitStatus != 0 {
-		t.Fatalf("ExitStatus=%d, but want %d", exitStatus, 0)
+	if exitStatus != ExitCodeOK {
+		t.Fatalf("ExitStatus=%d, but want %d", exitStatus, ExitCodeOK)
 	}
 
 	expected := fmt.Sprintf("Bookmark")
