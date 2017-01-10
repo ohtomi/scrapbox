@@ -1,7 +1,7 @@
 package command
 
 import (
-	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"net/url"
@@ -13,6 +13,53 @@ type ImportCommand struct {
 	Meta
 }
 
+func fetchRelatedPageTitlesByTag(host, project, tag string, client *Client) ([]string, error) {
+
+	p, err := client.GetPage(context.Background(), project, tag)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.RelatedPageTitles, nil
+}
+
+func fetchTagListByRelatedPageTitle(host, project, relatedPageTitle string, client *Client) (string, error) {
+
+	p, err := client.GetPage(context.Background(), project, relatedPageTitle)
+	if err != nil {
+		return "", err
+	}
+
+	var tagList = ""
+	for _, l := range p.Links {
+		tagList = fmt.Sprintf("%s #%s", tagList, l)
+	}
+
+	return strings.TrimSpace(tagList), nil
+}
+
+func writeRelatedPage(host, project, page, relatedPageTitle, tagList string) error {
+
+	statement := "insert into related_page(host, project, page, related_page, tag_list) values(?, ?, ?, ?, ?);"
+	parameters := []interface{}{host, project, page, relatedPageTitle, tagList}
+	if err := execSQL(statement, parameters); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func clearRelatedPage(host, project, page string) error {
+
+	statement := "delete from related_page where host = ? and project = ? and page = ?;"
+	parameters := []interface{}{host, project, page}
+	if err := execSQL(statement, parameters); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *ImportCommand) Run(args []string) int {
 
 	var (
@@ -22,8 +69,7 @@ func (c *ImportCommand) Run(args []string) int {
 		token   string
 		baseURL string
 
-		host   string
-		result bytes.Buffer
+		host string
 	)
 
 	flags := flag.NewFlagSet("import", flag.ContinueOnError)
@@ -37,41 +83,68 @@ func (c *ImportCommand) Run(args []string) int {
 	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
 
 	if err := flags.Parse(args); err != nil {
-		return 1
+		return ExitCodeParseFlagsError
 	}
 
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
 		c.Ui.Error("you must set PROJECT and TAG name.")
-		return 1
+		return ExitCodeBadArgs
 	}
 	project, tag = parsedArgs[0], parsedArgs[1]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT name.")
-		return 1
+		return ExitCodeProjectNotFound
 	}
 	if len(tag) == 0 {
 		c.Ui.Error("missing TAG name.")
-		return 1
+		return ExitCodeTagNotFound
 	}
 
 	if len(baseURL) == 0 {
 		baseURL = defaultURL
 	}
 
-	u, err := url.ParseRequestURI(baseURL)
+	parsedURL, err := url.ParseRequestURI(baseURL)
 	if err != nil {
 		c.Ui.Error("failed to parse url: " + baseURL)
-		return 1
+		return ExitCodeInvalidURL
 	}
-	host = u.Host
+	host = c.Meta.TrimPortFromHost(parsedURL.Host)
 
-	fmt.Fprintf(&result, "Imported keyword data from https://scrapbox.io/ohtomi to ~/.go-scrapbox/scrapbox.io/ohtomi/bookmark/db/")
-	c.Ui.Output(result.String())
+	// process
 
-	c.Ui.Output("debug: " + project + " " + tag + " " + token + " " + baseURL + " " + host)
-	return 0
+	client, err := NewClient(parsedURL, token)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to initialize api client: %s", err))
+		return ExitCodeError
+	}
+
+	titles, err := fetchRelatedPageTitlesByTag(host, project, tag, client)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to fetch related page titles: %s", err))
+		return ExitCodeFetchFailure
+	}
+
+	if err := clearRelatedPage(host, project, tag); err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to delete related page: %s", err))
+		return ExitCodeWriteRelatedPageFailure
+	}
+
+	for _, t := range titles {
+		tagList, err := fetchTagListByRelatedPageTitle(host, project, t, client)
+		if err != nil {
+			c.Ui.Error(fmt.Sprintf("failed to fetch tag list: %s", err))
+			continue
+		}
+		if err := writeRelatedPage(host, project, tag, t, tagList); err != nil {
+			c.Ui.Error(fmt.Sprintf("failed to write related page: %s", err))
+			return ExitCodeWriteRelatedPageFailure
+		}
+	}
+
+	return ExitCodeOK
 }
 
 func (c *ImportCommand) Synopsis() string {

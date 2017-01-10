@@ -33,6 +33,7 @@ const (
 	ExitCodeTagNotFound
 	ExitCodePageNotFound
 	ExitCodeFetchFailure
+	ExitCodeWriteRelatedPageFailure
 	ExitCodeReadCacheFailure
 	ExitCodeWriteCacheFailure
 	ExitCodeOpenURLFailure

@@ -10,6 +10,7 @@ import (
 
 const (
 	initializeSQL = `
+  create table related_page (host text, project text, page text, related_page text, tag_list text, unique(host, project, page, related_page));
   create table local_cache (host text, project text, page text, cached_at integer, unique(host, project, page));
   `
 )
