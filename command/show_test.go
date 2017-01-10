@@ -2,7 +2,6 @@ package command
 
 import (
 	"bytes"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -22,7 +21,7 @@ func TestShowCommand_implement(t *testing.T) {
 	testAPIServer := httptest.NewServer(muxAPI)
 	defer testAPIServer.Close()
 
-	muxAPI.HandleFunc("/api/pages/Bookmark", func(w http.ResponseWriter, r *http.Request) {
+	muxAPI.HandleFunc("/api/pages/ohtomi/Bookmark", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "../testdata/Bookmark.json")
 	})
 
@@ -32,7 +31,7 @@ func TestShowCommand_implement(t *testing.T) {
 		t.Fatalf("ExitStatus=%d, but want %d", exitStatus, ExitCodeOK)
 	}
 
-	expected := fmt.Sprintf("Bookmark")
+	expected := "Bookmark"
 	if !strings.Contains(outStream.String(), expected) {
 		t.Fatalf("Output=%q, but want %q", outStream.String(), expected)
 	}

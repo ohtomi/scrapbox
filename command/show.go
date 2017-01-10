@@ -25,7 +25,7 @@ func hasValidLocalCache(host, project, page string) bool {
 
 	var cachedAt int64 = 0
 
-	statement := "select cached_at from local_cache where host = ? and project = ? and page = ?"
+	statement := "select cached_at from local_cache where host = ? and project = ? and page = ?;"
 	parameters := []interface{}{host, project, page}
 	handler := func(rows *sql.Rows) error {
 		for rows.Next() {
@@ -74,7 +74,7 @@ func readLocalCache(host, project, page string) ([]string, error) {
 
 func writeLocalCache(host, project, page string, lines []string) error {
 
-	statement := "insert or replace into local_cache(host, project, page, cached_at) values(?, ?, ?, ?)"
+	statement := "insert or replace into local_cache(host, project, page, cached_at) values(?, ?, ?, ?);"
 	parameters := []interface{}{host, project, page, time.Now().Unix()}
 	if err := execSQL(statement, parameters); err != nil {
 		return err
@@ -106,7 +106,7 @@ func fetchPageContent(host, project, page, token string, parsedURL *url.URL) ([]
 		return nil, err
 	}
 
-	p, err := client.GetPage(context.Background(), page)
+	p, err := client.GetPage(context.Background(), project, page)
 	if err != nil {
 		return nil, err
 	}

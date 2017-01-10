@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -63,8 +64,8 @@ type Page struct {
 	RelatedPageTitles []string
 }
 
-func (c *Client) GetPage(ctx context.Context, page string) (*Page, error) {
-	spath := fmt.Sprintf("%s/%s", apiEndpoint, page)
+func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
+	spath := fmt.Sprintf("%s/%s/%s", apiEndpoint, project, page)
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
 		return nil, err
@@ -76,6 +77,9 @@ func (c *Client) GetPage(ctx context.Context, page string) (*Page, error) {
 	}
 
 	// Check status code here…
+	if res.StatusCode != 200 {
+		return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
+	}
 
 	var v interface{}
 	if err := c.decodeBody(res, &v); err != nil {
