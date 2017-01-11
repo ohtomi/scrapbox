@@ -15,7 +15,7 @@ func countRelatedPage(host, project, tag string) (int, error) {
 
 	var count int = 0
 
-	statement := "select count(*) from related_page where host = ? and project = ? and page = ?;"
+	statement := "select count(*) from related_page where host = ? and project = ? and tag = ?;"
 	parameters := []interface{}{host, project, tag}
 	handler := func(rows *sql.Rows) error {
 		for rows.Next() {

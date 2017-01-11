@@ -35,7 +35,7 @@ func fetchTagListAndFirstURLByTitle(host, project, relatedPage string, client *C
 
 func writeRelatedPage(host, project, tag, relatedPage, tagList, firstURL string) error {
 
-	statement := "insert into related_page(host, project, page, related_page, tag_list, first_url) values(?, ?, ?, ?, ?, ?);"
+	statement := "insert into related_page(host, project, tag, related_page, tag_list, first_url) values(?, ?, ?, ?, ?, ?);"
 	parameters := []interface{}{host, project, tag, relatedPage, tagList, firstURL}
 	if err := execSQL(statement, parameters); err != nil {
 		return err
@@ -44,10 +44,10 @@ func writeRelatedPage(host, project, tag, relatedPage, tagList, firstURL string)
 	return nil
 }
 
-func clearRelatedPage(host, project, page string) error {
+func clearRelatedPage(host, project, tag string) error {
 
-	statement := "delete from related_page where host = ? and project = ? and page = ?;"
-	parameters := []interface{}{host, project, page}
+	statement := "delete from related_page where host = ? and project = ? and tag = ?;"
+	parameters := []interface{}{host, project, tag}
 	if err := execSQL(statement, parameters); err != nil {
 		return err
 	}
