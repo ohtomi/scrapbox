@@ -1,9 +1,9 @@
 package command
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
 	"strings"
@@ -13,29 +13,35 @@ type OpenCommand struct {
 	Meta
 }
 
-func containsUrl(line string) (bool, string) {
+func queryFirstURL(host, project, tag, relatedPage string) (string, error) {
 
-	keywords := []string{"http://", "https://"}
-	whitespace := " "
+	var firstURL = ""
 
-	for _, k := range keywords {
-		if strings.Contains(line, k) {
-			if strings.Index(line, k) != -1 {
-				line = line[strings.Index(line, k):]
+	statement := "select first_url from related_page where host = ? and project = ? and lower(tag) = lower(?) and lower(related_page) = lower(?);"
+	parameters := []interface{}{host, project, tag, relatedPage}
+	handler := func(rows *sql.Rows) error {
+		for rows.Next() {
+			if err := rows.Scan(&firstURL); err != nil {
+				return err
 			}
-			if strings.Index(line, whitespace) != -1 {
-				line = line[:strings.Index(line, whitespace)]
-			}
-			return true, line
 		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		return nil
 	}
 
-	return false, ""
+	err := querySQL(statement, parameters, handler)
+	if err != nil {
+		return "", err
+	}
+
+	return firstURL, nil
 }
 
-func openUrl(parsedURL string) error {
+func openUrl(firstURL string) error {
 
-	if err := exec.Command("open", parsedURL).Start(); err != nil {
+	if err := exec.Command("open", firstURL).Start(); err != nil {
 		return err
 	}
 	return nil
@@ -45,10 +51,8 @@ func (c *OpenCommand) Run(args []string) int {
 
 	var (
 		project string
+		tag     string
 		page    string
-
-		token   string
-		baseURL string
 
 		host string
 	)
@@ -58,73 +62,50 @@ func (c *OpenCommand) Run(args []string) int {
 		c.Ui.Error(c.Help())
 	}
 
-	flags.StringVar(&token, "token", os.Getenv(EnvScrapboxToken), "")
-	flags.StringVar(&token, "t", os.Getenv(EnvScrapboxToken), "")
-	flags.StringVar(&baseURL, "url", os.Getenv(EnvScrapboxURL), "")
-	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
+	flags.StringVar(&host, "host", os.Getenv(EnvScrapboxHost), "")
+	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
 
 	if err := flags.Parse(args); err != nil {
 		return ExitCodeParseFlagsError
 	}
 
 	parsedArgs := flags.Args()
-	if len(parsedArgs) != 2 {
-		c.Ui.Error("you must set PROJECT and PAGE name.")
+	if len(parsedArgs) != 3 {
+		c.Ui.Error("you must set PROJECT, TAG, PAGE name.")
 		return ExitCodeBadArgs
 	}
-	project, page = parsedArgs[0], parsedArgs[1]
+	project, tag, page = parsedArgs[0], parsedArgs[1], parsedArgs[2]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT name.")
 		return ExitCodeProjectNotFound
+	}
+	if len(tag) == 0 {
+		c.Ui.Error("missing TAG name.")
+		return ExitCodeTagNotFound
 	}
 	if len(page) == 0 {
 		c.Ui.Error("missing PAGE name.")
 		return ExitCodePageNotFound
 	}
 
-	if len(baseURL) == 0 {
-		baseURL = defaultURL
+	if len(host) == 0 {
+		host = defaultHost
 	}
-
-	parsedURL, err := url.ParseRequestURI(baseURL)
-	if err != nil {
-		c.Ui.Error("failed to parse url: " + baseURL)
-		return ExitCodeInvalidURL
-	}
-	host = c.Meta.TrimPortFromHost(parsedURL.Host)
 
 	// process
 
-	if !hasValidLocalCache(host, project, page) {
-		lines, err := fetchPageContent(host, project, page, token, parsedURL)
-		if err != nil {
-			c.Ui.Error(fmt.Sprintf("failed to fetch page: %s", err))
-			return ExitCodeFetchFailure
-		}
-		if err := writeLocalCache(host, project, page, lines); err != nil {
-			c.Ui.Error(fmt.Sprintf("failed to write local cache: %s", err))
-			return ExitCodeWriteCacheFailure
-		}
+	firstURL, err := queryFirstURL(host, project, tag, page)
+	if err != nil || len(firstURL) == 0 {
+		c.Ui.Warn("no available url found.")
+		return ExitCodeNoAvailableURLFound
 	}
 
-	lines, err := readLocalCache(host, project, page)
-	if err != nil {
-		c.Ui.Error(fmt.Sprintf("failed to read local cache: %s", err))
-		return ExitCodeReadCacheFailure
+	if err := openUrl(firstURL); err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to open url: %s", err))
+		return ExitCodeOpenURLFailure
 	}
-	for _, line := range lines {
-		if has, clippedURL := containsUrl(line); has {
-			c.Ui.Output(clippedURL)
-			if err := openUrl(clippedURL); err != nil {
-				c.Ui.Error(fmt.Sprintf("failed to open url: %s", err))
-				return ExitCodeOpenURLFailure
-			}
-			return ExitCodeOK
-		}
-	}
-	c.Ui.Warn("no available url found.")
-	return ExitCodeNoAvailableURLFound
+	return ExitCodeOK
 }
 
 func (c *OpenCommand) Synopsis() string {
@@ -132,11 +113,10 @@ func (c *OpenCommand) Synopsis() string {
 }
 
 func (c *OpenCommand) Help() string {
-	helpText := `usage: scrapbox open [options...] PROJECT PAGE
+	helpText := `usage: scrapbox open [options...] HOST PROJECT TAG PAGE
 
 Options:
-  --token, -t  Scrapbox connect.sid which is used to access private project.
-  --url, -u    Scrapbox URL. By default, "https://scrapbox.io".
+  --host, -h   Scrapbox Host. By default, "scrapbox.io".
 `
 	return strings.TrimSpace(helpText)
 }

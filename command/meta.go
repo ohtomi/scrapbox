@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	defaultURL = "https://scrapbox.io"
+	defaultURL  = "https://scrapbox.io"
+	defaultHost = "scrapbox.io"
 )
 
 const (
@@ -19,6 +20,7 @@ const (
 const (
 	EnvScrapboxToken = "SCRAPBOX_TOKEN"
 	EnvScrapboxURL   = "SCRAPBOX_URL"
+	EnvScrapboxHost  = "SCRAPBOX_HOST"
 )
 
 const (
