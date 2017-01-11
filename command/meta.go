@@ -38,6 +38,7 @@ const (
 	ExitCodeWriteRelatedPageFailure
 	ExitCodeReadCacheFailure
 	ExitCodeWriteCacheFailure
+	ExitCodeNoRelatedPagesFound
 	ExitCodeOpenURLFailure
 	ExitCodeNoAvailableURLFound
 )

@@ -1,10 +1,9 @@
 package command
 
 import (
-	"bytes"
+	"database/sql"
 	"flag"
 	"fmt"
-	"net/url"
 	"os"
 	"strings"
 )
@@ -13,16 +12,45 @@ type ListCommand struct {
 	Meta
 }
 
+type RelatedPage struct {
+	title, tagList string
+}
+
+func queryRelatedPages(host, project, tag string) ([]RelatedPage, error) {
+
+	var relatedPages = []RelatedPage{}
+
+	statement := "select related_page, tag_list from related_page where host = ? and project = ? and lower(tag) = lower(?);"
+	parameters := []interface{}{host, project, tag}
+	handler := func(rows *sql.Rows) error {
+		for rows.Next() {
+			var title, tagList string
+			if err := rows.Scan(&title, &tagList); err != nil {
+				return err
+			}
+			relatedPages = append(relatedPages, RelatedPage{title, tagList})
+		}
+		if err := rows.Err(); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err := querySQL(statement, parameters, handler)
+	if err != nil {
+		return []RelatedPage{}, err
+	}
+
+	return relatedPages, nil
+}
+
 func (c *ListCommand) Run(args []string) int {
 
 	var (
 		project string
 		tag     string
 
-		baseURL string
-
-		host   string
-		result bytes.Buffer
+		host string
 	)
 
 	flags := flag.NewFlagSet("list", flag.ContinueOnError)
@@ -30,50 +58,45 @@ func (c *ListCommand) Run(args []string) int {
 		c.Ui.Error(c.Help())
 	}
 
-	flags.StringVar(&baseURL, "url", os.Getenv(EnvScrapboxURL), "")
-	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
+	flags.StringVar(&host, "host", os.Getenv(EnvScrapboxHost), "")
+	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
 
 	if err := flags.Parse(args); err != nil {
-		return 1
+		return ExitCodeParseFlagsError
 	}
 
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
 		c.Ui.Error("you must set PROJECT and TAG name.")
-		return 1
+		return ExitCodeBadArgs
 	}
 	project, tag = parsedArgs[0], parsedArgs[1]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT name.")
-		return 1
+		return ExitCodeProjectNotFound
 	}
 	if len(tag) == 0 {
 		c.Ui.Error("missing TAG name.")
-		return 1
+		return ExitCodeTagNotFound
 	}
 
-	if len(baseURL) == 0 {
-		baseURL = defaultURL
+	if len(host) == 0 {
+		host = defaultHost
 	}
 
-	u, err := url.ParseRequestURI(baseURL)
-	if err != nil {
-		c.Ui.Error("failed to parse url: " + baseURL)
-		return 1
+	// process
+
+	relatedPages, err := queryRelatedPages(host, project, tag)
+	if err != nil || len(relatedPages) == 0 {
+		return ExitCodeNoRelatedPagesFound
 	}
-	host = u.Host
 
-	fmt.Fprintf(&result, `Go Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
-Go (その2) Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
-Go (その3) Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
-高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA --- #gcli #Go #generator #Bookmark
-...
-`)
-	c.Ui.Output(result.String())
+	for _, r := range relatedPages {
+		c.Ui.Output(fmt.Sprintf("%s --- %s", r.title, r.tagList))
+	}
 
-	c.Ui.Output("debug: " + project + " " + tag + " " + baseURL + " " + host)
-	return 0
+	return ExitCodeOK
 }
 
 func (c *ListCommand) Synopsis() string {
@@ -84,7 +107,7 @@ func (c *ListCommand) Help() string {
 	helpText := `usage: scrapbox list [options...] PROJECT TAG
 
 Options:
-  --url, -u    Scrapbox URL. By default, "https://scrapbox.io".
+	--host, -h   Scrapbox Host. By default, "scrapbox.io".
 `
 	return strings.TrimSpace(helpText)
 }
