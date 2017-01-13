@@ -8,7 +8,6 @@ This tool provides command line interface for scrapbox.io.
 
 ```bash
 $ scrapbox import ohtomi bookmark
-Imported keyword data from https://scrapbox.io/ohtomi to ~/.go-scrapbox/scrapbox.io/ohtomi/bookmark/db/
 
 $ scrapbox list ohtomi bookmark
 Go Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
@@ -17,15 +16,15 @@ Go (その3) Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookma
 高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA --- #gcli #Go #generator #Bookmark
 ...
 
+$ scrapbox open ohtomi bookmark "高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA"
+-> open http://deeeet.com/writing/2014/06/22/cli-init/
+
 $ scrapbox show ohtomi "高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA"
 高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA
 http://deeeet.com/writing/2014/06/22/cli-init/
 https://github.com/tcnksm/gcli
 
 #gcli #Go #generator #Bookmark
-
-$ scrapbox open ohtomi "高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA"
--> open http://deeeet.com/writing/2014/06/22/cli-init/
 
 $ scrapbox download ohtomi "高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA" ./
 $ ls .
@@ -38,18 +37,20 @@ $ scrapbox upload ohtomi "./高速にGo言語のCLIツールをつくるcli-init
 
 - `SCRAPBOX_TOKEN`: specify `token` instead of `--token` option.
 - `SCRAPBOX_URL`: specify `url` instead of `--url` option.
+- `SCRAPBOX_HOST`: specify `host` instead of `--host` option.
 
 ### Local Cache Control
 
 ```bash
 $ scrapbox show --no-cache PROJECT PAGE
-$ scrapbox open --no-cache PROJECT PAGE
 ```
 
 ### Private Project
 
 ```bash
 $ scrapbox import   --token "your token" PROJECT TAG
+$ scrapbox list                          PROJECT TAG
+$ scrapbox open                          PROJECT TAG PAGE
 $ scrapbox show     --token "your token" PROJECT PAGE
 $ scrapbox download --token "your token" PROJECT PAGE /path/to/
 $ scrapbox upload   --token "your token" PROJECT /path/to/PAGE
@@ -59,9 +60,9 @@ $ scrapbox upload   --token "your token" PROJECT /path/to/PAGE
 
 ```bash
 $ scrapbox import   --url http://host:port/ PROJECT TAG
-$ scrapbox list     --url http://host:port/ PROJECT TAG
+$ scrapbox list     --host host             PROJECT TAG
+$ scrapbox open     --host host             PROJECT TAG PAGE
 $ scrapbox show     --url http://host:port/ PROJECT PAGE
-$ scrapbox open     --url http://host:port/ PROJECT PAGE
 $ scrapbox download --url http://host:port/ PROJECT PAGE /path/to/
 $ scrapbox upload   --url http://host:port/ PROJECT /path/to/PAGE
 ```
