@@ -121,20 +121,31 @@ func (p *Page) TagList() string {
 
 func (p *Page) FirstURL() string {
 
-	keywords := []string{"http://", "https://"}
+	includes := []string{"http://", "https://"}
+	excludes := []string{".png", ".gif", ".jpg", ".jpeg", ".svg"}
 	whitespace := " "
 
-	for _, line := range p.Lines {
-		for _, k := range keywords {
-			if strings.Contains(line, k) {
-				if strings.Index(line, k) != -1 {
-					line = line[strings.Index(line, k):]
-				}
-				if strings.Index(line, whitespace) != -1 {
-					line = line[:strings.Index(line, whitespace)]
-				}
-				return line
+	match := func(line string, keywords []string) string {
+		for _, keyword := range keywords {
+			if strings.Contains(line, keyword) {
+				return keyword
 			}
+		}
+		return ""
+	}
+
+	for _, line := range p.Lines {
+		if matched := match(line, includes); matched != "" {
+			if match(line, excludes) != "" {
+				continue
+			}
+			if strings.Index(line, matched) != -1 {
+				line = line[strings.Index(line, matched):]
+			}
+			if strings.Index(line, whitespace) != -1 {
+				line = line[:strings.Index(line, whitespace)]
+			}
+			return line
 		}
 	}
 
