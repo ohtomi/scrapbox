@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"net/http"
+	"net/url"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -51,7 +52,7 @@ func TestImportCommand_implement(t *testing.T) {
 	muxAPI.HandleFunc("/api/pages/ohtomi/Bookmark", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "../testdata/Bookmark.json")
 	})
-	muxAPI.HandleFunc("/api/pages/ohtomi/GolangでAPI Clientを実装する | SOTA", func(w http.ResponseWriter, r *http.Request) {
+	muxAPI.HandleFunc("/api/pages/ohtomi/" + url.QueryEscape("GolangでAPI Clientを実装する | SOTA"), func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "../testdata/GolangでAPI Clientを実装する | SOTA.json")
 	})
 

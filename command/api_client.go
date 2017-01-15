@@ -68,7 +68,7 @@ type Page struct {
 
 func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
 
-	spath := fmt.Sprintf("%s/%s/%s", apiEndpoint, project, page)
+	spath := fmt.Sprintf("%s/%s/%s", apiEndpoint, url.QueryEscape(project), url.QueryEscape(page))
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
 		return nil, err
