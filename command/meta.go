@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	defaultURL  = "https://scrapbox.io"
-	defaultHost = "scrapbox.io"
+	defaultURL     = "https://scrapbox.io"
+	defaultHost    = "scrapbox.io"
+	defaultDestDir = "./"
 )
 
 const (
@@ -18,9 +19,10 @@ const (
 )
 
 const (
-	EnvScrapboxToken = "SCRAPBOX_TOKEN"
-	EnvScrapboxURL   = "SCRAPBOX_URL"
-	EnvScrapboxHost  = "SCRAPBOX_HOST"
+	EnvScrapboxToken   = "SCRAPBOX_TOKEN"
+	EnvScrapboxURL     = "SCRAPBOX_URL"
+	EnvScrapboxHost    = "SCRAPBOX_HOST"
+	EnvScrapboxDestDir = "SCRAPBOX_DEST_DIR"
 )
 
 const (
@@ -43,6 +45,7 @@ const (
 	ExitCodeNoRelatedPagesFound
 	ExitCodeOpenURLFailure
 	ExitCodeNoAvailableURLFound
+	ExitCodeWriteFileFailure
 )
 
 var (
