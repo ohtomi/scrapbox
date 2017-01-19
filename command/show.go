@@ -93,7 +93,7 @@ func writeLocalCache(host, project, page string, lines []string) error {
 	defer fout.Close()
 
 	for _, line := range lines {
-		fout.WriteString(line)
+		fout.WriteString(fmt.Sprintf("%s\n", line))
 	}
 
 	return nil
