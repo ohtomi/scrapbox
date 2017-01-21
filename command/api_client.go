@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"strings"
 )
 
@@ -34,10 +33,10 @@ func NewClient(url *url.URL, token string) (*Client, error) {
 
 func (c *Client) newRequest(ctx context.Context, method, spath string, body io.Reader) (*http.Request, error) {
 
-	u := *c.URL
-	u.Path = path.Join(c.URL.Path, spath)
+	baseURL := *c.URL
+	u := fmt.Sprintf("%s/%s", baseURL.String(), spath)
 
-	req, err := http.NewRequest(method, u.String(), body)
+	req, err := http.NewRequest(method, u, body)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +67,15 @@ type Page struct {
 
 func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
 
-	spath := fmt.Sprintf("%s/%s/%s", apiEndpoint, project, page)
+	encodeURIComponent := func(component string) string {
+		regularEscaped := url.QueryEscape(component)
+		rParenUnescaped := strings.Replace(regularEscaped, "%28", "(", -1)
+		lParenUnescaped := strings.Replace(rParenUnescaped, "%29", ")", -1)
+		plusEscaped := strings.Replace(lParenUnescaped, "+", "%20", -1)
+		return plusEscaped
+	}
+
+	spath := fmt.Sprintf("%s/%s/%s", apiEndpoint, project, encodeURIComponent(page))
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
 		return nil, err
