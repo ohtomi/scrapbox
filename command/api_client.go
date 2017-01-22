@@ -58,6 +58,14 @@ func (c *Client) decodeBody(resp *http.Response, out interface{}) error {
 	return decoder.Decode(out)
 }
 
+func (c *Client) encodeURIComponent(component string) string {
+	regularEscaped := url.QueryEscape(component)
+	rParenUnescaped := strings.Replace(regularEscaped, "%28", "(", -1)
+	lParenUnescaped := strings.Replace(rParenUnescaped, "%29", ")", -1)
+	plusEscaped := strings.Replace(lParenUnescaped, "+", "%20", -1)
+	return plusEscaped
+}
+
 type Page struct {
 	Title             string
 	Lines             []string
@@ -66,16 +74,7 @@ type Page struct {
 }
 
 func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
-
-	encodeURIComponent := func(component string) string {
-		regularEscaped := url.QueryEscape(component)
-		rParenUnescaped := strings.Replace(regularEscaped, "%28", "(", -1)
-		lParenUnescaped := strings.Replace(rParenUnescaped, "%29", ")", -1)
-		plusEscaped := strings.Replace(lParenUnescaped, "+", "%20", -1)
-		return plusEscaped
-	}
-
-	spath := fmt.Sprintf("%s/%s/%s", apiEndpoint, project, encodeURIComponent(page))
+	spath := fmt.Sprintf("%s/%s/%s", apiEndpoint, project, c.encodeURIComponent(page))
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
 		return nil, err
