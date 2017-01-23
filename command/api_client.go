@@ -101,16 +101,15 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 	var fout *os.File
 	if debugMode {
 		host := (*c.URL).Host
-		directory := path.Join(scrapboxHome, "page", host, project)
+		directory := path.Join("testdata", host, project)
 		if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 			return nil, err
 		}
 		filepath := canonicalFilepath(directory, page)
-		fout, err := os.Create(filepath)
+		fout, err = os.Create(filepath)
 		if err != nil {
 			return nil, err
 		}
-		defer fout.Close()
 	}
 
 	var v interface{}
