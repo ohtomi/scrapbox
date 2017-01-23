@@ -140,7 +140,6 @@ func (c *ShowCommand) Run(args []string) int {
 	flags.StringVar(&token, "t", os.Getenv(EnvScrapboxToken), "")
 	flags.StringVar(&baseURL, "url", os.Getenv(EnvScrapboxURL), "")
 	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
-	flags.BoolVar(&debugMode, "debug", false, "")
 
 	if err := flags.Parse(args); err != nil {
 		return ExitCodeParseFlagsError

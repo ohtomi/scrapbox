@@ -9,22 +9,22 @@ import (
 )
 
 const (
-	defaultURL     = "https://scrapbox.io"
-	defaultHost    = "scrapbox.io"
-	defaultDestDir = "./"
+	defaultURL  = "https://scrapbox.io"
+	defaultHost = "scrapbox.io"
+
+	defaultDownloadDir = "./"
 )
 
 const (
-	apiEndpoint = "api/pages"
+	EnvScrapboxToken = "SCRAPBOX_TOKEN"
+	EnvScrapboxURL   = "SCRAPBOX_URL"
+	EnvScrapboxHost  = "SCRAPBOX_HOST"
+
+	EnvDownloadDir = "SCRAPBOX_DOWNLOAD_DIR"
 )
 
 const (
-	EnvScrapboxToken   = "SCRAPBOX_TOKEN"
-	EnvScrapboxURL     = "SCRAPBOX_URL"
-	EnvScrapboxHost    = "SCRAPBOX_HOST"
-	EnvScrapboxDestDir = "SCRAPBOX_DEST_DIR"
-
-	EnvDebug = "SCRAPBOX_DEBUG"
+	apiEndPoint = "api/pages"
 )
 
 const (
@@ -50,10 +50,23 @@ const (
 	ExitCodeWriteFileFailure
 )
 
-var (
-	scrapboxHome = path.Join(os.Getenv("HOME"), ".scrapbox")
-	debugMode    = false
+const (
+	EnvHome  = "SCRAPBOX_HOME"
+	EnvDebug = "SCRAPBOX_DEBUG"
 )
+
+var scrapboxHome string
+var debugMode bool
+
+func InitializeMeta() {
+
+	scrapboxHome = os.Getenv(EnvHome)
+	if len(scrapboxHome) == 0 {
+		scrapboxHome = path.Join(os.Getenv("HOME"), ".scrapbox")
+	}
+
+	debugMode = os.Getenv(EnvDebug) != ""
+}
 
 // Meta contain the meta-option that nearly all subcommand inherited.
 type Meta struct {

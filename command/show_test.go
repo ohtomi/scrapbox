@@ -11,6 +11,9 @@ import (
 )
 
 func TestShowCommand_implement(t *testing.T) {
+
+	InitializeMeta()
+
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := newTestMeta(outStream, errStream, inStream)
 	command := &ShowCommand{

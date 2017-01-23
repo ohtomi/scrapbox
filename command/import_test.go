@@ -38,6 +38,9 @@ func countRelatedPage(host, project, tag string) (int, error) {
 }
 
 func TestImportCommand_implement(t *testing.T) {
+
+	InitializeMeta()
+
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := newTestMeta(outStream, errStream, inStream)
 	command := &ImportCommand{

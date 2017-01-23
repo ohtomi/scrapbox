@@ -55,9 +55,8 @@ func (c *DownloadCommand) Run(args []string) int {
 	flags.StringVar(&token, "t", os.Getenv(EnvScrapboxToken), "")
 	flags.StringVar(&baseURL, "url", os.Getenv(EnvScrapboxURL), "")
 	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
-	flags.StringVar(&directory, "dest", os.Getenv(EnvScrapboxDestDir), "")
-	flags.StringVar(&directory, "d", os.Getenv(EnvScrapboxDestDir), "")
-	flags.BoolVar(&debugMode, "debug", false, "")
+	flags.StringVar(&directory, "dest", os.Getenv(EnvDownloadDir), "")
+	flags.StringVar(&directory, "d", os.Getenv(EnvDownloadDir), "")
 
 	if err := flags.Parse(args); err != nil {
 		return ExitCodeParseFlagsError
@@ -83,7 +82,7 @@ func (c *DownloadCommand) Run(args []string) int {
 		baseURL = defaultURL
 	}
 	if len(directory) == 0 {
-		directory = defaultDestDir
+		directory = defaultDownloadDir
 	}
 
 	parsedURL, err := url.ParseRequestURI(baseURL)
