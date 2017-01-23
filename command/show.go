@@ -48,12 +48,17 @@ func hasValidLocalCache(host, project, page string) bool {
 	return diff <= int64(cacheExpiration)
 }
 
+func canonicalFilepath(directory, filename string) string {
+	escapedFilename := strings.Replace(filename, "/", "%2F", -1)
+	return path.Join(directory, escapedFilename)
+}
+
 func readLocalCache(host, project, page string) ([]string, error) {
 
 	var lines []string
 
 	directory := path.Join(scrapboxHome, "page", host, project)
-	filepath := path.Join(directory, page)
+	filepath := canonicalFilepath(directory, page)
 
 	fin, err := os.Open(filepath)
 	if err != nil {
@@ -81,7 +86,7 @@ func writeLocalCache(host, project, page string, lines []string) error {
 	}
 
 	directory := path.Join(scrapboxHome, "page", host, project)
-	filepath := path.Join(directory, page)
+	filepath := canonicalFilepath(directory, page)
 
 	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 		return err
@@ -135,6 +140,7 @@ func (c *ShowCommand) Run(args []string) int {
 	flags.StringVar(&token, "t", os.Getenv(EnvScrapboxToken), "")
 	flags.StringVar(&baseURL, "url", os.Getenv(EnvScrapboxURL), "")
 	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
+	flags.BoolVar(&debugMode, "debug", false, "")
 
 	if err := flags.Parse(args); err != nil {
 		return ExitCodeParseFlagsError

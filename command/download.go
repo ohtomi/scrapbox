@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"path"
 	"strings"
 )
 
@@ -15,7 +14,7 @@ type DownloadCommand struct {
 
 func writeLocalFile(directory, page string, lines []string) error {
 
-	filepath := path.Join(directory, page)
+	filepath := canonicalFilepath(directory, page)
 
 	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 		return err
@@ -58,6 +57,7 @@ func (c *DownloadCommand) Run(args []string) int {
 	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
 	flags.StringVar(&directory, "dest", os.Getenv(EnvScrapboxDestDir), "")
 	flags.StringVar(&directory, "d", os.Getenv(EnvScrapboxDestDir), "")
+	flags.BoolVar(&debugMode, "debug", false, "")
 
 	if err := flags.Parse(args); err != nil {
 		return ExitCodeParseFlagsError

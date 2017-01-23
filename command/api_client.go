@@ -6,8 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+	"path"
 	"strings"
 )
 
@@ -52,8 +55,12 @@ func (c *Client) newRequest(ctx context.Context, method, spath string, body io.R
 	return req, nil
 }
 
-func (c *Client) decodeBody(resp *http.Response, out interface{}) error {
+func (c *Client) decodeBody(resp *http.Response, out interface{}, f *os.File) error {
 	defer resp.Body.Close()
+	if f != nil {
+		resp.Body = ioutil.NopCloser(io.TeeReader(resp.Body, f))
+		defer f.Close()
+	}
 	decoder := json.NewDecoder(resp.Body)
 	return decoder.Decode(out)
 }
@@ -90,8 +97,24 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 		return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
 	}
 
+	// Check debug mode
+	var fout *os.File
+	if debugMode {
+		host := (*c.URL).Host
+		directory := path.Join(scrapboxHome, "page", host, project)
+		if err := os.MkdirAll(directory, os.ModePerm); err != nil {
+			return nil, err
+		}
+		filepath := canonicalFilepath(directory, page)
+		fout, err := os.Create(filepath)
+		if err != nil {
+			return nil, err
+		}
+		defer fout.Close()
+	}
+
 	var v interface{}
-	if err := c.decodeBody(res, &v); err != nil {
+	if err := c.decodeBody(res, &v, fout); err != nil {
 		return nil, err
 	}
 

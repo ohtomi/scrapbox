@@ -64,6 +64,7 @@ func (c *OpenCommand) Run(args []string) int {
 
 	flags.StringVar(&host, "host", os.Getenv(EnvScrapboxHost), "")
 	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
+	flags.BoolVar(&debugMode, "debug", false, "")
 
 	if err := flags.Parse(args); err != nil {
 		return ExitCodeParseFlagsError

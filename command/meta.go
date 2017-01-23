@@ -23,6 +23,8 @@ const (
 	EnvScrapboxURL     = "SCRAPBOX_URL"
 	EnvScrapboxHost    = "SCRAPBOX_HOST"
 	EnvScrapboxDestDir = "SCRAPBOX_DEST_DIR"
+
+	EnvDebug = "SCRAPBOX_DEBUG"
 )
 
 const (
@@ -50,6 +52,7 @@ const (
 
 var (
 	scrapboxHome = path.Join(os.Getenv("HOME"), ".scrapbox")
+	debugMode    = false
 )
 
 // Meta contain the meta-option that nearly all subcommand inherited.
