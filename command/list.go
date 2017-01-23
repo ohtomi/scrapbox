@@ -62,23 +62,23 @@ func (c *ListCommand) Run(args []string) int {
 	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
 
 	if err := flags.Parse(args); err != nil {
-		return ExitCodeParseFlagsError
+		return int(ExitCodeParseFlagsError)
 	}
 
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
 		c.Ui.Error("you must set PROJECT and TAG name.")
-		return ExitCodeBadArgs
+		return int(ExitCodeBadArgs)
 	}
 	project, tag = parsedArgs[0], parsedArgs[1]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT name.")
-		return ExitCodeProjectNotFound
+		return int(ExitCodeProjectNotFound)
 	}
 	if len(tag) == 0 {
 		c.Ui.Error("missing TAG name.")
-		return ExitCodeTagNotFound
+		return int(ExitCodeTagNotFound)
 	}
 
 	if len(host) == 0 {
@@ -89,14 +89,14 @@ func (c *ListCommand) Run(args []string) int {
 
 	relatedPages, err := queryRelatedPages(host, project, tag)
 	if err != nil || len(relatedPages) == 0 {
-		return ExitCodeNoRelatedPagesFound
+		return int(ExitCodeNoRelatedPagesFound)
 	}
 
 	for _, r := range relatedPages {
 		c.Ui.Output(fmt.Sprintf("%s --- %s", r.title, r.tagList))
 	}
 
-	return ExitCodeOK
+	return int(ExitCodeOK)
 }
 
 func (c *ListCommand) Synopsis() string {

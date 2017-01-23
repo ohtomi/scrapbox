@@ -78,23 +78,23 @@ func (c *ImportCommand) Run(args []string) int {
 	flags.StringVar(&baseURL, "u", os.Getenv(EnvScrapboxURL), "")
 
 	if err := flags.Parse(args); err != nil {
-		return ExitCodeParseFlagsError
+		return int(ExitCodeParseFlagsError)
 	}
 
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
 		c.Ui.Error("you must set PROJECT and TAG name.")
-		return ExitCodeBadArgs
+		return int(ExitCodeBadArgs)
 	}
 	project, tag = parsedArgs[0], parsedArgs[1]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT name.")
-		return ExitCodeProjectNotFound
+		return int(ExitCodeProjectNotFound)
 	}
 	if len(tag) == 0 {
 		c.Ui.Error("missing TAG name.")
-		return ExitCodeTagNotFound
+		return int(ExitCodeTagNotFound)
 	}
 
 	if len(baseURL) == 0 {
@@ -104,7 +104,7 @@ func (c *ImportCommand) Run(args []string) int {
 	parsedURL, err := url.ParseRequestURI(baseURL)
 	if err != nil {
 		c.Ui.Error("failed to parse url: " + baseURL)
-		return ExitCodeInvalidURL
+		return int(ExitCodeInvalidURL)
 	}
 	host = c.Meta.TrimPortFromHost(parsedURL.Host)
 
@@ -113,18 +113,18 @@ func (c *ImportCommand) Run(args []string) int {
 	client, err := NewClient(parsedURL, token)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to initialize api client: %s", err))
-		return ExitCodeError
+		return int(ExitCodeError)
 	}
 
 	titles, err := fetchRelatedPageTitlesByTag(host, project, tag, client)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to fetch related page titles: %s", err))
-		return ExitCodeFetchFailure
+		return int(ExitCodeFetchFailure)
 	}
 
 	if err := clearRelatedPage(host, project, tag); err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to delete related page: %s", err))
-		return ExitCodeWriteRelatedPageFailure
+		return int(ExitCodeWriteRelatedPageFailure)
 	}
 
 	for _, t := range titles {
@@ -135,11 +135,11 @@ func (c *ImportCommand) Run(args []string) int {
 		}
 		if err := writeRelatedPage(host, project, tag, t, tagList, firstURL); err != nil {
 			c.Ui.Error(fmt.Sprintf("failed to write related page: %s", err))
-			return ExitCodeWriteRelatedPageFailure
+			return int(ExitCodeWriteRelatedPageFailure)
 		}
 	}
 
-	return ExitCodeOK
+	return int(ExitCodeOK)
 }
 
 func (c *ImportCommand) Synopsis() string {

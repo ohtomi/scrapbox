@@ -59,23 +59,23 @@ func (c *DownloadCommand) Run(args []string) int {
 	flags.StringVar(&directory, "d", os.Getenv(EnvDownloadDir), "")
 
 	if err := flags.Parse(args); err != nil {
-		return ExitCodeParseFlagsError
+		return int(ExitCodeParseFlagsError)
 	}
 
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 2 {
 		c.Ui.Error("you must set PROJECT and PAGE name.")
-		return ExitCodeBadArgs
+		return int(ExitCodeBadArgs)
 	}
 	project, page = parsedArgs[0], parsedArgs[1]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT name.")
-		return ExitCodeProjectNotFound
+		return int(ExitCodeProjectNotFound)
 	}
 	if len(page) == 0 {
 		c.Ui.Error("missing PAGE name.")
-		return ExitCodePageNotFound
+		return int(ExitCodePageNotFound)
 	}
 
 	if len(baseURL) == 0 {
@@ -88,7 +88,7 @@ func (c *DownloadCommand) Run(args []string) int {
 	parsedURL, err := url.ParseRequestURI(baseURL)
 	if err != nil {
 		c.Ui.Error("failed to parse url: " + baseURL)
-		return ExitCodeInvalidURL
+		return int(ExitCodeInvalidURL)
 	}
 	host = c.Meta.TrimPortFromHost(parsedURL.Host)
 
@@ -97,15 +97,15 @@ func (c *DownloadCommand) Run(args []string) int {
 	lines, err := fetchPageContent(host, project, page, token, parsedURL)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to fetch page: %s", err))
-		return ExitCodeFetchFailure
+		return int(ExitCodeFetchFailure)
 	}
 
 	if err := writeLocalFile(directory, page, lines); err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to write local file: %s", err))
-		return ExitCodeWriteFileFailure
+		return int(ExitCodeWriteFileFailure)
 	}
 
-	return ExitCodeOK
+	return int(ExitCodeOK)
 }
 
 func (c *DownloadCommand) Synopsis() string {

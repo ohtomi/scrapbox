@@ -30,8 +30,8 @@ func TestShowCommand_implement(t *testing.T) {
 
 	args := strings.Split("--url "+testAPIServer.URL+" ohtomi Bookmark", " ")
 	exitStatus := command.Run(args)
-	if exitStatus != ExitCodeOK {
-		t.Fatalf("ExitStatus=%d, but want %d", exitStatus, ExitCodeOK)
+	if ExitCode(exitStatus) != ExitCodeOK {
+		t.Fatalf("ExitStatus=%s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
 
 	expected := "Bookmark"

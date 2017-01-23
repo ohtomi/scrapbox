@@ -66,27 +66,27 @@ func (c *OpenCommand) Run(args []string) int {
 	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
 
 	if err := flags.Parse(args); err != nil {
-		return ExitCodeParseFlagsError
+		return int(ExitCodeParseFlagsError)
 	}
 
 	parsedArgs := flags.Args()
 	if len(parsedArgs) != 3 {
 		c.Ui.Error("you must set PROJECT, TAG, PAGE name.")
-		return ExitCodeBadArgs
+		return int(ExitCodeBadArgs)
 	}
 	project, tag, page = parsedArgs[0], parsedArgs[1], parsedArgs[2]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT name.")
-		return ExitCodeProjectNotFound
+		return int(ExitCodeProjectNotFound)
 	}
 	if len(tag) == 0 {
 		c.Ui.Error("missing TAG name.")
-		return ExitCodeTagNotFound
+		return int(ExitCodeTagNotFound)
 	}
 	if len(page) == 0 {
 		c.Ui.Error("missing PAGE name.")
-		return ExitCodePageNotFound
+		return int(ExitCodePageNotFound)
 	}
 
 	if len(host) == 0 {
@@ -98,14 +98,14 @@ func (c *OpenCommand) Run(args []string) int {
 	firstURL, err := queryFirstURL(host, project, tag, page)
 	if err != nil || len(firstURL) == 0 {
 		c.Ui.Warn("no available url found.")
-		return ExitCodeNoAvailableURLFound
+		return int(ExitCodeNoAvailableURLFound)
 	}
 
 	if err := openUrl(firstURL); err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to open url: %s", err))
-		return ExitCodeOpenURLFailure
+		return int(ExitCodeOpenURLFailure)
 	}
-	return ExitCodeOK
+	return int(ExitCodeOK)
 }
 
 func (c *OpenCommand) Synopsis() string {
