@@ -3,6 +3,7 @@ package command
 import (
 	"bytes"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -51,26 +52,25 @@ func TestImportCommand_implement(t *testing.T) {
 	testAPIServer := httptest.NewServer(muxAPI)
 	defer testAPIServer.Close()
 
-	muxAPI.HandleFunc("/api/pages/ohtomi/Bookmark", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "../testdata/Bookmark.json")
-	})
-	muxAPI.HandleFunc("/api/pages/ohtomi/GolangでAPI Clientを実装する | SOTA", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "../testdata/GolangでAPI Clientを実装する | SOTA.json")
+	muxAPI.HandleFunc("/api/pages/go-scrapbox/", func(w http.ResponseWriter, r *http.Request) {
+		path := strings.Replace(r.URL.Path, "/api/pages/go-scrapbox/", "", -1)
+		escaped := strings.Replace(path, "/", "%2F", -1)
+		http.ServeFile(w, r, fmt.Sprintf("../testdata/scrapbox.io/go-scrapbox/%s", escaped))
 	})
 
-	args := strings.Split("--url "+testAPIServer.URL+" ohtomi Bookmark", " ")
+	args := strings.Split("--url "+testAPIServer.URL+" go-scrapbox english", " ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
-		t.Fatalf("ExitStatus=%s, but want %s", ExitCode(exitStatus), ExitCodeOK)
+		t.Fatalf("ExitStatus actual %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
 
-	actual, err := countRelatedPage("127.0.0.1", "ohtomi", "Bookmark")
+	actual, err := countRelatedPage("127.0.0.1", "go-scrapbox", "english")
 	if err != nil {
 		t.Fatalf("failed to count related page: %s", err)
 	}
 
-	expected := 1
+	expected := 5
 	if actual != expected {
-		t.Fatalf("Output=%d, but want %d", actual, expected)
+		t.Fatalf("Count actual %d, but want %d", actual, expected)
 	}
 }
