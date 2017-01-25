@@ -2,16 +2,13 @@ package command
 
 import (
 	"bytes"
-	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
 
 	_ "github.com/mitchellh/cli"
 )
 
-func TestShowCommand_implement(t *testing.T) {
+func TestShowCommand__show_english(t *testing.T) {
 
 	InitializeMeta()
 
@@ -21,15 +18,8 @@ func TestShowCommand_implement(t *testing.T) {
 		Meta: *meta,
 	}
 
-	muxAPI := http.NewServeMux()
-	testAPIServer := httptest.NewServer(muxAPI)
+	testAPIServer := runAPIServer()
 	defer testAPIServer.Close()
-
-	muxAPI.HandleFunc("/api/pages/go-scrapbox/", func(w http.ResponseWriter, r *http.Request) {
-		path := strings.Replace(r.URL.Path, "/api/pages/go-scrapbox/", "", -1)
-		escaped := strings.Replace(path, "/", "%2F", -1)
-		http.ServeFile(w, r, fmt.Sprintf("../testdata/scrapbox.io/go-scrapbox/%s", escaped))
-	})
 
 	args := strings.Split("--url "+testAPIServer.URL+" go-scrapbox english", " ")
 	exitStatus := command.Run(args)
