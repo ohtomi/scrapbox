@@ -1,11 +1,39 @@
 package command
 
+// scrapbox list [project [tag]]
+
 import (
+	"bytes"
+	"strings"
 	"testing"
 
-	"github.com/mitchellh/cli"
+	_ "github.com/mitchellh/cli"
 )
 
-func TestListCommand_implement(t *testing.T) {
-	var _ cli.Command = &ListCommand{}
+func TestListCommand__list_by_english(t *testing.T) {
+
+	InitializeMeta()
+
+	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
+	meta := NewTestMeta(outStream, errStream, inStream)
+	command := &ListCommand{
+		Meta: *meta,
+	}
+
+	args := strings.Split("--host 127.0.0.1 go-scrapbox english", " ")
+	exitStatus := command.Run(args)
+	if ExitCode(exitStatus) != ExitCodeOK {
+		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
+	}
+
+	expected :=
+		`title having paren ( ) mark --- #english #no-url #whitespace #no-slash #paren #no-plus #no-question
+title having plus + mark --- #english #no-url #whitespace #no-slash #no-paren #plus #no-question
+title having question ? mark --- #english #no-url #whitespace #no-slash #no-paren #no-plus #question
+title having slash / mark --- #english #no-url #whitespace #slash #no-paren #no-plus #no-question
+title having whitespaces --- #english #no-url #whitespace #no-slash #no-paren #no-plus #no-question
+`
+	if !strings.Contains(outStream.String(), expected) {
+		t.Fatalf("Output is %q, but want %q", outStream.String(), expected)
+	}
 }

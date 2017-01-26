@@ -107,7 +107,7 @@ func (c *ListCommand) Help() string {
 	helpText := `usage: scrapbox list [options...] PROJECT TAG
 
 Options:
-	--host, -h   Scrapbox Host. By default, "scrapbox.io".
+  --host, -h   Scrapbox Host. By default, "scrapbox.io".
 `
 	return strings.TrimSpace(helpText)
 }

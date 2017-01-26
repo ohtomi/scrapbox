@@ -1,5 +1,7 @@
 package command
 
+// scrapbox import --url http://xxx --token xxx project tag
+
 import (
 	"bytes"
 	"database/sql"
@@ -14,16 +16,18 @@ import (
 	"github.com/mitchellh/cli"
 )
 
-func setTestEnv(key, val string) func() {
+func SetTestEnv(key, newValue string) func() {
 
-	preVal := os.Getenv(key)
-	os.Setenv(key, val)
-	return func() {
-		os.Setenv(key, preVal)
+	prevValue := os.Getenv(key)
+	os.Setenv(key, newValue)
+	reverter := func() {
+		os.Setenv(key, prevValue)
 	}
+	return reverter
 }
 
-func newTestMeta(outStream, errStream io.Writer, inStream io.Reader) *Meta {
+func NewTestMeta(outStream, errStream io.Writer, inStream io.Reader) *Meta {
+
 	return &Meta{
 		Ui: &cli.BasicUi{
 			Writer:      outStream,
@@ -32,7 +36,7 @@ func newTestMeta(outStream, errStream io.Writer, inStream io.Reader) *Meta {
 		}}
 }
 
-func runAPIServer() *httptest.Server {
+func RunAPIServer() *httptest.Server {
 
 	muxAPI := http.NewServeMux()
 	testAPIServer := httptest.NewServer(muxAPI)
@@ -48,7 +52,7 @@ func runAPIServer() *httptest.Server {
 
 func countRelatedPage(host, project, tag string) (int, error) {
 
-	var count int = 0
+	count := 0
 
 	statement := "select count(*) from related_page where host = ? and project = ? and tag = ?;"
 	parameters := []interface{}{host, project, tag}
@@ -77,18 +81,18 @@ func TestImportCommand__import_english_pages(t *testing.T) {
 	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
-	meta := newTestMeta(outStream, errStream, inStream)
+	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &ImportCommand{
 		Meta: *meta,
 	}
 
-	testAPIServer := runAPIServer()
+	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
 	args := strings.Split("--url "+testAPIServer.URL+" go-scrapbox english", " ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
-		t.Fatalf("ExitStatus actual %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
+		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
 
 	actual, err := countRelatedPage("127.0.0.1", "go-scrapbox", "english")
@@ -98,7 +102,7 @@ func TestImportCommand__import_english_pages(t *testing.T) {
 
 	expected := 5
 	if actual != expected {
-		t.Fatalf("Count actual %d, but want %d", actual, expected)
+		t.Fatalf("Count is %d, but want %d", actual, expected)
 	}
 }
 
@@ -107,18 +111,18 @@ func TestImportCommand__import_japanese_pages(t *testing.T) {
 	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
-	meta := newTestMeta(outStream, errStream, inStream)
+	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &ImportCommand{
 		Meta: *meta,
 	}
 
-	testAPIServer := runAPIServer()
+	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
 	args := strings.Split("--url "+testAPIServer.URL+" go-scrapbox japanese", " ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
-		t.Fatalf("ExitStatus actual %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
+		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
 
 	actual, err := countRelatedPage("127.0.0.1", "go-scrapbox", "japanese")
@@ -128,6 +132,6 @@ func TestImportCommand__import_japanese_pages(t *testing.T) {
 
 	expected := 6
 	if actual != expected {
-		t.Fatalf("Count actual %d, but want %d", actual, expected)
+		t.Fatalf("Count is %d, but want %d", actual, expected)
 	}
 }
