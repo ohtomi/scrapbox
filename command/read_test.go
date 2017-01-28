@@ -1,7 +1,5 @@
 package command
 
-// scrapbox read --token xxx project page
-
 import (
 	"bytes"
 	"strings"
@@ -10,20 +8,20 @@ import (
 	_ "github.com/mitchellh/cli"
 )
 
-func TestShowCommand__show_english(t *testing.T) {
+func TestReadCommand__print_english(t *testing.T) {
 
 	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
-	command := &ShowCommand{
+	command := &ReadCommand{
 		Meta: *meta,
 	}
 
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--url "+testAPIServer.URL+" go-scrapbox english", " ")
+	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english", " ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)

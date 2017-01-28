@@ -1,7 +1,5 @@
 package command
 
-// scrapbox download --url http://xxx --token xxx project page /path/to/file
-
 import (
 	"bytes"
 	"strings"
@@ -10,20 +8,17 @@ import (
 	_ "github.com/mitchellh/cli"
 )
 
-func TestDownloadCommand__todo(t *testing.T) {
+func TestLinkCommand__todo(t *testing.T) {
 
 	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
-	command := &DownloadCommand{
+	command := &LinkCommand{
 		Meta: *meta,
 	}
 
-	testAPIServer := RunAPIServer()
-	defer testAPIServer.Close()
-
-	args := strings.Split("--url "+testAPIServer.URL+" --dest ../testdata/download/ go-scrapbox english", " ")
+	args := strings.Split("go-scrapbox japanese HTTPなリンクのあるページ", " ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)

@@ -8,21 +8,21 @@ import (
 	"strings"
 )
 
-type ListCommand struct {
+type ReadCommand struct {
 	Meta
 }
 
-func (c *ListCommand) Run(args []string) int {
+func (c *ReadCommand) Run(args []string) int {
 
 	var (
 		project string
-		tags    []string
+		page    string
 
 		token string
 		host  string
 	)
 
-	flags := flag.NewFlagSet("list", flag.ContinueOnError)
+	flags := flag.NewFlagSet("read", flag.ContinueOnError)
 	flags.Usage = func() {
 		c.Ui.Error(c.Help())
 	}
@@ -37,15 +37,19 @@ func (c *ListCommand) Run(args []string) int {
 	}
 
 	parsedArgs := flags.Args()
-	if len(parsedArgs) < 1 {
-		c.Ui.Error("you must set PROJECT.")
+	if len(parsedArgs) != 2 {
+		c.Ui.Error("you must set PROJECT and PAGE.")
 		return int(ExitCodeBadArgs)
 	}
-	project, tags = parsedArgs[0], parsedArgs[1:]
+	project, page = parsedArgs[0], parsedArgs[1]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT.")
 		return int(ExitCodeProjectNotFound)
+	}
+	if len(page) == 0 {
+		c.Ui.Error("missing PAGE.")
+		return int(ExitCodePageNotFound)
 	}
 
 	if len(host) == 0 {
@@ -59,21 +63,21 @@ func (c *ListCommand) Run(args []string) int {
 	}
 
 	// process
-	c.Ui.Info(fmt.Sprintf("%s %s %s %s", project, tags, token, host))
+	c.Ui.Info(fmt.Sprintf("%s %s %s %s", project, page, token, host))
 
 	return int(ExitCodeOK)
 }
 
-func (c *ListCommand) Synopsis() string {
-	return "List page titles containing specified tags"
+func (c *ReadCommand) Synopsis() string {
+	return "Print content of the scrapbox page"
 }
 
-func (c *ListCommand) Help() string {
-	helpText := `usage: scrapbox list [options...] PROJECT [TAGs...]
+func (c *ReadCommand) Help() string {
+	helpText := `usage: scrapbox read [options...] PROJECT PAGE
 
 Options:
   --token, -t  Scrapbox connect.sid used to access private project.
-  --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
 `
 	return strings.TrimSpace(helpText)
 }

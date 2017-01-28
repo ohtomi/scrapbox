@@ -8,11 +8,11 @@ import (
 	"strings"
 )
 
-type OpenCommand struct {
+type LinkCommand struct {
 	Meta
 }
 
-func (c *OpenCommand) Run(args []string) int {
+func (c *LinkCommand) Run(args []string) int {
 
 	var (
 		project string
@@ -60,17 +60,17 @@ func (c *OpenCommand) Run(args []string) int {
 	}
 
 	// process
-	c.Ui.Info(fmt.Sprintf("%s %s %s %s", project, page, host))
+	c.Ui.Info(fmt.Sprintf("%s %s %s", project, page, host))
 
 	return int(ExitCodeOK)
 }
 
-func (c *OpenCommand) Synopsis() string {
-	return "Open the scrapbox page in the browser"
+func (c *LinkCommand) Synopsis() string {
+	return "Open each URLs, written in the scrapbox page, in the browser"
 }
 
-func (c *OpenCommand) Help() string {
-	helpText := `usage: scrapbox open [options...] PROJECT PAGE
+func (c *LinkCommand) Help() string {
+	helpText := `usage: scrapbox link [options...] PROJECT PAGE
 
 Options:
 	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".

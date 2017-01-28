@@ -1,7 +1,5 @@
 package command
 
-// scrapbox list [project [tag]]
-
 import (
 	"bytes"
 	"strings"
@@ -10,7 +8,7 @@ import (
 	_ "github.com/mitchellh/cli"
 )
 
-func TestListCommand__list_by_english(t *testing.T) {
+func TestListCommand__find_by_english(t *testing.T) {
 
 	InitializeMeta()
 
@@ -20,7 +18,10 @@ func TestListCommand__list_by_english(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("--host 127.0.0.1 go-scrapbox english", " ")
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english", " ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
