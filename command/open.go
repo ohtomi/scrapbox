@@ -12,6 +12,10 @@ type OpenCommand struct {
 	Meta
 }
 
+func (c *OpenCommand) BuildPageURL(host, project, page string) string {
+	return fmt.Sprintf("%s/%s/%s", host, project, EncodeURIComponent(page))
+}
+
 func (c *OpenCommand) Run(args []string) int {
 
 	var (
@@ -55,18 +59,20 @@ func (c *OpenCommand) Run(args []string) int {
 
 	_, err := url.ParseRequestURI(host)
 	if err != nil {
-		c.Ui.Error("failed to parse url: " + host)
+		c.Ui.Error(fmt.Sprintf("failed to parse the url. host: %s, cause: %s", host, err))
 		return int(ExitCodeInvalidURL)
 	}
 
 	// process
-	c.Ui.Info(fmt.Sprintf("%s %s %s %s", project, page, host))
+
+	pageURL := c.BuildPageURL(host, project, page)
+	c.Ui.Info(pageURL)
 
 	return int(ExitCodeOK)
 }
 
 func (c *OpenCommand) Synopsis() string {
-	return "Open the scrapbox page in the browser"
+	return "Print the URL of the scrapbox page"
 }
 
 func (c *OpenCommand) Help() string {

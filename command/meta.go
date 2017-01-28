@@ -9,18 +9,12 @@ import (
 )
 
 const (
-	defaultURL  = "https://scrapbox.io"
-	defaultHost = "scrapbox.io"
-
-	defaultDownloadDir = "./"
+	defaultHost = "https://scrapbox.io"
 )
 
 const (
 	EnvScrapboxToken = "SCRAPBOX_TOKEN"
-	EnvScrapboxURL   = "SCRAPBOX_URL"
 	EnvScrapboxHost  = "SCRAPBOX_HOST"
-
-	EnvDownloadDir = "SCRAPBOX_DOWNLOAD_DIR"
 )
 
 const (

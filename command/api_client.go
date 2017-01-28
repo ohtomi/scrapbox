@@ -11,12 +11,21 @@ import (
 	"net/url"
 	"os"
 	"path"
+	"regexp"
 	"strings"
 )
 
 const (
 	userAgent = "ScrapboxGoClient/0.1.0"
 )
+
+func EncodeURIComponent(component string) string {
+	regularEscaped := url.QueryEscape(component)
+	rParenUnescaped := strings.Replace(regularEscaped, "%28", "(", -1)
+	lParenUnescaped := strings.Replace(rParenUnescaped, "%29", ")", -1)
+	plusEscaped := strings.Replace(lParenUnescaped, "+", "%20", -1)
+	return plusEscaped
+}
 
 type Client struct {
 	URL        *url.URL
@@ -66,11 +75,7 @@ func (c *Client) decodeBody(resp *http.Response, out interface{}, f *os.File) er
 }
 
 func (c *Client) encodeURIComponent(component string) string {
-	regularEscaped := url.QueryEscape(component)
-	rParenUnescaped := strings.Replace(regularEscaped, "%28", "(", -1)
-	lParenUnescaped := strings.Replace(rParenUnescaped, "%29", ")", -1)
-	plusEscaped := strings.Replace(lParenUnescaped, "+", "%20", -1)
-	return plusEscaped
+	return EncodeURIComponent(component)
 }
 
 type Page struct {
@@ -147,7 +152,7 @@ func (p *Page) TagList() string {
 	return strings.TrimSpace(tagList)
 }
 
-func (p *Page) FirstURL() string {
+func (p *Page) ExtractExternalLinks() []string {
 
 	includes := []string{"http://", "https://"}
 	excludes := []string{".png", ".gif", ".jpg", ".jpeg", ".svg"}
@@ -162,20 +167,26 @@ func (p *Page) FirstURL() string {
 		return ""
 	}
 
+	linkURLs := []string{}
+
 	for _, line := range p.Lines {
 		if matched := match(line, includes); matched != "" {
 			if match(line, excludes) != "" {
 				continue
 			}
+			foundBracket, _ := regexp.MatchString(fmt.Sprintf("\\[.*%s.*\\]", matched), line)
 			if strings.Index(line, matched) != -1 {
 				line = line[strings.Index(line, matched):]
 			}
 			if strings.Index(line, whitespace) != -1 {
 				line = line[:strings.Index(line, whitespace)]
 			}
-			return line
+			if foundBracket && strings.Index(line, "]") == len(line)-1 {
+				line = line[:len(line)-1]
+			}
+			linkURLs = append(linkURLs, line)
 		}
 	}
 
-	return ""
+	return linkURLs
 }

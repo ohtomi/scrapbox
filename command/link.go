@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/url"
@@ -12,13 +13,24 @@ type LinkCommand struct {
 	Meta
 }
 
+func (c *LinkCommand) FetchAllLinks(client *Client, project, page string) ([]string, error) {
+
+	p, err := client.GetPage(context.Background(), project, page)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.ExtractExternalLinks(), nil
+}
+
 func (c *LinkCommand) Run(args []string) int {
 
 	var (
 		project string
 		page    string
 
-		host string
+		token string
+		host  string
 	)
 
 	flags := flag.NewFlagSet("open", flag.ContinueOnError)
@@ -26,6 +38,8 @@ func (c *LinkCommand) Run(args []string) int {
 		c.Ui.Error(c.Help())
 	}
 
+	flags.StringVar(&token, "token", os.Getenv(EnvScrapboxToken), "")
+	flags.StringVar(&token, "t", os.Getenv(EnvScrapboxToken), "")
 	flags.StringVar(&host, "host", os.Getenv(EnvScrapboxHost), "")
 	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
 
@@ -53,26 +67,42 @@ func (c *LinkCommand) Run(args []string) int {
 		host = defaultHost
 	}
 
-	_, err := url.ParseRequestURI(host)
+	parsedURL, err := url.ParseRequestURI(host)
 	if err != nil {
-		c.Ui.Error("failed to parse url: " + host)
+		c.Ui.Error(fmt.Sprintf("failed to parse the url. host: %s, cause: %s", host, err))
 		return int(ExitCodeInvalidURL)
 	}
 
 	// process
-	c.Ui.Info(fmt.Sprintf("%s %s %s", project, page, host))
+
+	client, err := NewClient(parsedURL, token)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to initialize api client. cause: %s", err))
+		return int(ExitCodeError)
+	}
+
+	linkURLs, err := c.FetchAllLinks(client, project, page)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page"))
+		return int(ExitCodeFetchFailure)
+	}
+
+	for _, u := range linkURLs {
+		c.Ui.Info(u)
+	}
 
 	return int(ExitCodeOK)
 }
 
 func (c *LinkCommand) Synopsis() string {
-	return "Open each URLs, written in the scrapbox page, in the browser"
+	return "Print all URLs in the scrapbox page"
 }
 
 func (c *LinkCommand) Help() string {
 	helpText := `usage: scrapbox link [options...] PROJECT PAGE
 
 Options:
+  --token, -t  Scrapbox connect.sid used to access private project.
 	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
 `
 	return strings.TrimSpace(helpText)

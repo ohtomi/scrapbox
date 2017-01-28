@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/url"
@@ -10,6 +11,16 @@ import (
 
 type ReadCommand struct {
 	Meta
+}
+
+func (c *ReadCommand) FetchContent(client *Client, project, page string) ([]string, error) {
+
+	p, err := client.GetPage(context.Background(), project, page)
+	if err != nil {
+		return nil, err
+	}
+
+	return p.Lines, nil
 }
 
 func (c *ReadCommand) Run(args []string) int {
@@ -56,20 +67,35 @@ func (c *ReadCommand) Run(args []string) int {
 		host = defaultHost
 	}
 
-	_, err := url.ParseRequestURI(host)
+	parsedURL, err := url.ParseRequestURI(host)
 	if err != nil {
-		c.Ui.Error("failed to parse url: " + host)
+		c.Ui.Error(fmt.Sprintf("failed to parse the url. host: %s, cause: %s", host, err))
 		return int(ExitCodeInvalidURL)
 	}
 
 	// process
-	c.Ui.Info(fmt.Sprintf("%s %s %s %s", project, page, token, host))
+
+	client, err := NewClient(parsedURL, token)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to initialize api client. cause: %s", err))
+		return int(ExitCodeError)
+	}
+
+	lines, err := c.FetchContent(client, project, page)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page"))
+		return int(ExitCodeFetchFailure)
+	}
+
+	for _, l := range lines {
+		c.Ui.Info(l)
+	}
 
 	return int(ExitCodeOK)
 }
 
 func (c *ReadCommand) Synopsis() string {
-	return "Print content of the scrapbox page"
+	return "Print the content of the scrapbox page"
 }
 
 func (c *ReadCommand) Help() string {
