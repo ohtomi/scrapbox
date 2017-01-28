@@ -7,64 +7,66 @@ This tool provides command line interface for scrapbox.io.
 ## Usage
 
 ```bash
-$ scrapbox import ohtomi bookmark
+$ scrapbox list go-scrapbox
+title having paren ( ) mark
+title having plus + mark
+title having question ? mark
+title having slash / mark
+title having whitespaces
+日本語タイトルのページ
+地のリンクがあるページ
+複数のリンクがあるページ
+文章のなかにリンクがあるページ1
+文章のなかにリンクがあるページ2
 
-$ scrapbox list ohtomi bookmark
-Go Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
-Go (その2) Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
-Go (その3) Advent Calendar 2016 - Qiita --- #Go #adventcalendar #Qiita #Bookmark
-高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA --- #gcli #Go #generator #Bookmark
-...
+$ scrapbox list go-scrapbox english
+title having paren ( ) mark
+title having plus + mark
+title having question ? mark
+title having slash / mark
+title having whitespaces
 
-$ scrapbox open ohtomi bookmark "高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA"
--> open http://deeeet.com/writing/2014/06/22/cli-init/
+$ scrapbox list go-scrapbox english paren
+title having paren ( ) mark
 
-$ scrapbox show ohtomi "高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA"
-高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA
-http://deeeet.com/writing/2014/06/22/cli-init/
-https://github.com/tcnksm/gcli
+$ scrapbox list --tags go-scrapbox english
+title having paren ( ) mark --- #english #no-url #whitespace #no-slash #paren #no-plus #no-question
+title having plus + mark --- #english #no-url #whitespace #no-slash #no-paren #plus #no-question
+title having question ? mark --- #english #no-url #whitespace #no-slash #no-paren #no-plus #question
+title having slash / mark --- #english #no-url #whitespace #slash #no-paren #no-plus #no-question
+title having whitespaces --- #english #no-url #whitespace #no-slash #no-paren #no-plus #no-question
 
-#gcli #Go #generator #Bookmark
+$ scrapbox read --no-cache go-scrapbox "title having paren ( ) mark"
+title having paren ( ) mark
+#english #no-url #whitespace #no-slash #paren #no-plus #no-question
 
-$ scrapbox download ohtomi "高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA" ./
-$ ls .
-高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA
+$ scrapbox open go-scrapbox "title having paren ( ) mark"
+https://scrapbox.io/go-scrapbox/title%20having%20paren%20(%20)%20mark
 
-$ scrapbox upload ohtomi "./高速にGo言語のCLIツールをつくるcli-initというツールをつくった | SOTA"
+$ scrapbox link go-scrapbox "複数のリンクがあるページ"
+https://www.google.co.jp
+https://www.google.com
 ```
 
 ### Environment Variables
 
 - `SCRAPBOX_TOKEN`: specify `token` instead of `--token` option.
-- `SCRAPBOX_URL`: specify `url` instead of `--url` option.
 - `SCRAPBOX_HOST`: specify `host` instead of `--host` option.
-
-### Local Cache Control
-
-```bash
-$ scrapbox show --no-cache PROJECT PAGE
-```
 
 ### Private Project
 
+To access private project, use `--token` option:
+
 ```bash
-$ scrapbox import   --token "your token" PROJECT TAG
-$ scrapbox list                          PROJECT TAG
-$ scrapbox open                          PROJECT TAG PAGE
-$ scrapbox show     --token "your token" PROJECT PAGE
-$ scrapbox download --token "your token" PROJECT PAGE /path/to/
-$ scrapbox upload   --token "your token" PROJECT /path/to/PAGE
+$ scrapbox <sub command> --token s%3A... <arguments>
 ```
 
 ### Scrapbox Enterprise
 
+To access Scrapbox Enterprise, use `--host` option:
+
 ```bash
-$ scrapbox import   --url http://host:port/ PROJECT TAG
-$ scrapbox list     --host host             PROJECT TAG
-$ scrapbox open     --host host             PROJECT TAG PAGE
-$ scrapbox show     --url http://host:port/ PROJECT PAGE
-$ scrapbox download --url http://host:port/ PROJECT PAGE /path/to/
-$ scrapbox upload   --url http://host:port/ PROJECT /path/to/PAGE
+$ scrapbox <sub command> --host http://host:port <arguments>
 ```
 
 ## Install
