@@ -83,7 +83,7 @@ func (c *ReadCommand) Run(args []string) int {
 
 	lines, err := c.FetchContent(client, project, page)
 	if err != nil {
-		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page"))
+		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page. cause: %s", err))
 		return int(ExitCodeFetchFailure)
 	}
 

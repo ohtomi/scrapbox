@@ -83,7 +83,7 @@ func (c *LinkCommand) Run(args []string) int {
 
 	linkURLs, err := c.FetchAllLinks(client, project, page)
 	if err != nil {
-		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page"))
+		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page. cause: %s", err))
 		return int(ExitCodeFetchFailure)
 	}
 
