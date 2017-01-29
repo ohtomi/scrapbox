@@ -18,7 +18,10 @@ func TestListCommand__find_by_english(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox english", " ")
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english", " ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)

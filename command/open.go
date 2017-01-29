@@ -54,7 +54,7 @@ func (c *OpenCommand) Run(args []string) int {
 	}
 
 	if len(host) == 0 {
-		host = defaultHost
+		host = DefaultHost
 	}
 
 	_, err := url.ParseRequestURI(host)

@@ -18,7 +18,10 @@ func TestReadCommand__print_url_having_paren(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having paren ( ) mark", "  ")
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having paren ( ) mark", "  ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
@@ -40,7 +43,10 @@ func TestReadCommand__print_url_having_plus(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having plus + mark", "  ")
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having plus + mark", "  ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
@@ -62,7 +68,10 @@ func TestReadCommand__print_url_having_question(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having question ? mark", "  ")
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having question ? mark", "  ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
@@ -84,7 +93,10 @@ func TestReadCommand__print_url_having_slash(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having slash / mark", "  ")
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having slash / mark", "  ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
@@ -106,7 +118,10 @@ func TestReadCommand__print_url_having_whitespace(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having whitespaces", "  ")
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having whitespaces", "  ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
@@ -128,7 +143,10 @@ func TestReadCommand__print_url_having_japanese(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  日本語タイトルのページ", "  ")
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  日本語タイトルのページ", "  ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)

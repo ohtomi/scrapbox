@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path"
 	"strings"
 	"testing"
 
@@ -38,10 +39,25 @@ func RunAPIServer() *httptest.Server {
 	muxAPI := http.NewServeMux()
 	testAPIServer := httptest.NewServer(muxAPI)
 
+	muxAPI.HandleFunc("/api/pages/go-scrapbox/search/query", func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query()
+		skip := query.Get("skip")
+		limit := query.Get("limit")
+		tags := query["q"]
+
+		filename := fmt.Sprintf("%s-%s", skip, limit)
+		directory := path.Join("../testdata/query/scrapbox.io/go-scrapbox", path.Join(tags...))
+		filepath := path.Join(directory, EncodeFilename(filename))
+		http.ServeFile(w, r, filepath)
+	})
+
 	muxAPI.HandleFunc("/api/pages/go-scrapbox/", func(w http.ResponseWriter, r *http.Request) {
-		path := strings.Replace(r.URL.Path, "/api/pages/go-scrapbox/", "", -1)
-		escaped := strings.Replace(path, "/", "%2F", -1)
-		http.ServeFile(w, r, fmt.Sprintf("../testdata/scrapbox.io/go-scrapbox/%s", escaped))
+		urlPath := r.URL.Path
+
+		filename := strings.Replace(urlPath, "/api/pages/go-scrapbox/", "", -1)
+		directory := "../testdata/page/scrapbox.io/go-scrapbox"
+		filepath := path.Join(directory, EncodeFilename(filename))
+		http.ServeFile(w, r, filepath)
 	})
 
 	return testAPIServer

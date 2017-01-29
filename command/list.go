@@ -60,7 +60,7 @@ func (c *ListCommand) Run(args []string) int {
 	}
 
 	if len(host) == 0 {
-		host = defaultHost
+		host = DefaultHost
 	}
 
 	parsedURL, err := url.ParseRequestURI(host)

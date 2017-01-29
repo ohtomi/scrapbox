@@ -8,16 +8,8 @@ import (
 )
 
 const (
-	defaultHost = "https://scrapbox.io"
-)
-
-const (
 	EnvScrapboxToken = "SCRAPBOX_TOKEN"
 	EnvScrapboxHost  = "SCRAPBOX_HOST"
-)
-
-const (
-	apiEndPoint = "api/pages"
 )
 
 type ExitCode int

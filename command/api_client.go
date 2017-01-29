@@ -16,7 +16,15 @@ import (
 )
 
 const (
+	DefaultHost = "https://scrapbox.io"
+)
+
+const (
 	userAgent = "ScrapboxGoClient/0.1.0"
+
+	apiEndPoint = "api/pages"
+
+	searchPath = "search/query?skip=%d&sort=updated&limit=%d&q=%s"
 )
 
 func EncodeURIComponent(component string) string {
@@ -25,6 +33,40 @@ func EncodeURIComponent(component string) string {
 	lParenUnescaped := strings.Replace(rParenUnescaped, "%29", ")", -1)
 	plusEscaped := strings.Replace(lParenUnescaped, "+", "%20", -1)
 	return plusEscaped
+}
+
+func EncodeFilename(filename string) string {
+	return strings.Replace(filename, "/", "%2F", -1)
+}
+
+func OpenQueryResultFile(host, project string, tags []string, skip, limit int) (*os.File, error) {
+
+	directory := path.Join("testdata", "query", host, project, path.Join(tags...))
+	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
+		return nil, err
+	}
+	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
+	fout, err := os.Create(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	return fout, nil
+}
+
+func OpenPageFile(host, project, page string) (*os.File, error) {
+
+	directory := path.Join("testdata", "page", host, project)
+	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
+		return nil, err
+	}
+	filepath := path.Join(directory, EncodeFilename(page))
+	fout, err := os.Create(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	return fout, nil
 }
 
 type Client struct {
@@ -86,7 +128,7 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 		pages []string
 	)
 
-	query := fmt.Sprintf("search/query?skip=%d&sort=updated&limit=%d&q=%s", skip, limit, EncodeURIComponent(strings.Join(tags, " ")))
+	query := fmt.Sprintf(searchPath, skip, limit, EncodeURIComponent(strings.Join(tags, " ")))
 	spath := fmt.Sprintf("%s/%s/%s", apiEndPoint, project, query)
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
@@ -107,12 +149,7 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 	var fout *os.File
 	if debugMode {
 		host := (*c.URL).Host
-		directory := path.Join("testdata", "query", host, project, path.Join(tags...))
-		if err := os.MkdirAll(directory, os.ModePerm); err != nil {
-			return nil, err
-		}
-		filepath := canonicalFilepath(directory, fmt.Sprintf("%d-%d", skip, limit))
-		fout, err = os.Create(filepath)
+		fout, err = OpenQueryResultFile(host, project, tags, skip, limit)
 		if err != nil {
 			return nil, err
 		}
@@ -170,12 +207,7 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 	var fout *os.File
 	if debugMode {
 		host := (*c.URL).Host
-		directory := path.Join("testdata", "page", host, project)
-		if err := os.MkdirAll(directory, os.ModePerm); err != nil {
-			return nil, err
-		}
-		filepath := canonicalFilepath(directory, page)
-		fout, err = os.Create(filepath)
+		fout, err = OpenPageFile(host, project, page)
 		if err != nil {
 			return nil, err
 		}
@@ -201,14 +233,6 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 		Lines: lines,
 		Links: links,
 	}, nil
-}
-
-func (p *Page) TagList() string {
-	var tagList = ""
-	for _, l := range p.Links {
-		tagList = fmt.Sprintf("%s #%s", tagList, l)
-	}
-	return strings.TrimSpace(tagList)
 }
 
 func (p *Page) ExtractExternalLinks() []string {
