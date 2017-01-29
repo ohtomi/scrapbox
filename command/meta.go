@@ -31,17 +31,17 @@ const (
 	EnvDebug = "SCRAPBOX_DEBUG"
 )
 
-var scrapboxHome string
-var debugMode bool
+var ScrapboxHome string
+var DebugMode bool
 
 func InitializeMeta() {
 
-	scrapboxHome = os.Getenv(EnvHome)
-	if len(scrapboxHome) == 0 {
-		scrapboxHome = path.Join(os.Getenv("HOME"), ".scrapbox")
+	ScrapboxHome = os.Getenv(EnvHome)
+	if len(ScrapboxHome) == 0 {
+		ScrapboxHome = path.Join(os.Getenv("HOME"), ".scrapbox")
 	}
 
-	debugMode = os.Getenv(EnvDebug) != ""
+	DebugMode = os.Getenv(EnvDebug) != ""
 }
 
 // Meta contain the meta-option that nearly all subcommand inherited.

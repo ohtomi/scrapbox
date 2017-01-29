@@ -41,7 +41,7 @@ func EncodeFilename(filename string) string {
 
 func OpenQueryResultFile(host, project string, tags []string, skip, limit int) (*os.File, error) {
 
-	directory := path.Join("testdata", "query", host, project, path.Join(tags...))
+	directory := path.Join(ScrapboxHome, "query", host, project, path.Join(tags...))
 	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func OpenQueryResultFile(host, project string, tags []string, skip, limit int) (
 
 func OpenPageFile(host, project, page string) (*os.File, error) {
 
-	directory := path.Join("testdata", "page", host, project)
+	directory := path.Join(ScrapboxHome, "page", host, project)
 	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 		return nil, err
 	}
@@ -145,14 +145,10 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 		return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
 	}
 
-	// Check debug mode
-	var fout *os.File
-	if debugMode {
-		host := (*c.URL).Host
-		fout, err = OpenQueryResultFile(host, project, tags, skip, limit)
-		if err != nil {
-			return nil, err
-		}
+	host := (*c.URL).Host
+	fout, err := OpenQueryResultFile(host, project, tags, skip, limit)
+	if err != nil {
+		return nil, err
 	}
 
 	var v interface{}
@@ -203,14 +199,10 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 		return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
 	}
 
-	// Check debug mode
-	var fout *os.File
-	if debugMode {
-		host := (*c.URL).Host
-		fout, err = OpenPageFile(host, project, page)
-		if err != nil {
-			return nil, err
-		}
+	host := (*c.URL).Host
+	fout, err := OpenPageFile(host, project, page)
+	if err != nil {
+		return nil, err
 	}
 
 	var v interface{}

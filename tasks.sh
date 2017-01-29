@@ -23,16 +23,30 @@ case "$1" in
     rm -fr ./testdata
     echo
     echo running debug mode to dump api reponse ...
-    env SCRAPBOX_DEBUG=1 ./scrapbox import go-scrapbox english
-    env SCRAPBOX_DEBUG=1 ./scrapbox import go-scrapbox japanese
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox list go-scrapbox english
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox list go-scrapbox japanese
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "title having paren ( ) mark"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "title having plus + mark"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "title having question ? mark"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "title having slash / mark"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "title having whitespaces"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "日本語タイトルのページ"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "HTTPなリンクのあるページ"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "HTTPSなリンクのあるページ"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "地のリンクがあるページ"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "複数のリンクがあるページ"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "文章のなかにリンクがあるページ1"
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "文章のなかにリンクがあるページ2"
     echo
-    ls -lR ./testdata/scrapbox.io/go-scrapbox
+    ls -l ./testdata/query/scrapbox.io/go-scrapbox/english
+    ls -l ./testdata/query/scrapbox.io/go-scrapbox/japanese
+    ls -l ./testdata/page/scrapbox.io/go-scrapbox
     ;;
   "test")
     echo cleaning up ~/.scrapbox ...
     rm -fr ~/.scrapbox
     echo
     echo testing ...
-    go test github.com/ohtomi/scrapbox/command -v
+    env SCRAPBOX_HOME="`pwd`/testdata" go test github.com/ohtomi/scrapbox/command -v
     ;;
 esac
