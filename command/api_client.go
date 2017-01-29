@@ -74,19 +74,20 @@ func (c *Client) decodeBody(resp *http.Response, out interface{}, f *os.File) er
 	return decoder.Decode(out)
 }
 
-func (c *Client) encodeURIComponent(component string) string {
-	return EncodeURIComponent(component)
+type QueryResult struct {
+	Count int
+	Pages []string
 }
 
-type Page struct {
-	Title             string
-	Lines             []string
-	Links             []string
-	RelatedPageTitles []string
-}
+func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, skip, limit int) (*QueryResult, error) {
 
-func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
-	spath := fmt.Sprintf("%s/%s/%s", apiEndPoint, project, c.encodeURIComponent(page))
+	var (
+		count int
+		pages []string
+	)
+
+	query := fmt.Sprintf("search/query?skip=%d&sort=updated&limit=%d&q=%s", skip, limit, EncodeURIComponent(strings.Join(tags, " ")))
+	spath := fmt.Sprintf("%s/%s/%s", apiEndPoint, project, query)
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
 		return nil, err
@@ -106,7 +107,70 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 	var fout *os.File
 	if debugMode {
 		host := (*c.URL).Host
-		directory := path.Join("testdata", host, project)
+		directory := path.Join("testdata", "query", host, project, path.Join(tags...))
+		if err := os.MkdirAll(directory, os.ModePerm); err != nil {
+			return nil, err
+		}
+		filepath := canonicalFilepath(directory, fmt.Sprintf("%d-%d", skip, limit))
+		fout, err = os.Create(filepath)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var v interface{}
+	if err := c.decodeBody(res, &v, fout); err != nil {
+		return nil, err
+	}
+
+	for _, p := range v.(interface{}).(map[string]interface{})["pages"].([]interface{}) {
+		pages = append(pages, p.(map[string]interface{})["title"].(interface{}).(string))
+	}
+
+	count = int(v.(interface{}).(map[string]interface{})["count"].(float64))
+	if count > limit+skip || count == limit {
+		q, err := c.ExecQuery(context.Background(), project, tags, skip+limit, limit)
+		if err != nil {
+			return nil, err
+		}
+		pages = append(pages, q.Pages...)
+	}
+
+	return &QueryResult{
+		Count: count,
+		Pages: pages,
+	}, nil
+}
+
+type Page struct {
+	Title string
+	Lines []string
+	Links []string
+}
+
+func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
+
+	spath := fmt.Sprintf("%s/%s/%s", apiEndPoint, project, EncodeURIComponent(page))
+	req, err := c.newRequest(ctx, "GET", spath, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check status code here…
+	if res.StatusCode != 200 {
+		return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
+	}
+
+	// Check debug mode
+	var fout *os.File
+	if debugMode {
+		host := (*c.URL).Host
+		directory := path.Join("testdata", "page", host, project)
 		if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 			return nil, err
 		}
@@ -131,16 +195,11 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 	for i, l := range v.(interface{}).(map[string]interface{})["links"].([]interface{}) {
 		links[i] = l.(string)
 	}
-	relatedPageTitles := make([]string, len(v.(interface{}).(map[string]interface{})["relatedPages"].([]interface{})))
-	for i, r := range v.(interface{}).(map[string]interface{})["relatedPages"].([]interface{}) {
-		relatedPageTitles[i] = r.(map[string]interface{})["title"].(interface{}).(string)
-	}
 
 	return &Page{
-		Title:             title,
-		Lines:             lines,
-		Links:             links,
-		RelatedPageTitles: relatedPageTitles,
+		Title: title,
+		Lines: lines,
+		Links: links,
 	}, nil
 }
 

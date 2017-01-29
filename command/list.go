@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"net/url"
@@ -10,6 +11,16 @@ import (
 
 type ListCommand struct {
 	Meta
+}
+
+func (c *ListCommand) FetchRelatedPages(client *Client, project string, tags []string) ([]string, error) {
+
+	q, err := client.ExecQuery(context.Background(), project, tags, 0, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	return q.Pages, nil
 }
 
 func (c *ListCommand) Run(args []string) int {
@@ -52,14 +63,29 @@ func (c *ListCommand) Run(args []string) int {
 		host = defaultHost
 	}
 
-	_, err := url.ParseRequestURI(host)
+	parsedURL, err := url.ParseRequestURI(host)
 	if err != nil {
 		c.Ui.Error("failed to parse url: " + host)
 		return int(ExitCodeInvalidURL)
 	}
 
 	// process
-	c.Ui.Info(fmt.Sprintf("%s %s %s %s", project, tags, token, host))
+
+	client, err := NewClient(parsedURL, token)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to initialize api client. cause: %s", err))
+		return int(ExitCodeError)
+	}
+
+	relatedPages, err := c.FetchRelatedPages(client, project, tags)
+	if err != nil {
+		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page. cause: %s", err))
+		return int(ExitCodeFetchFailure)
+	}
+
+	for _, p := range relatedPages {
+		c.Ui.Info(p)
+	}
 
 	return int(ExitCodeOK)
 }
