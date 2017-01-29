@@ -3,7 +3,6 @@ package command
 import (
 	"os"
 	"path"
-	"strings"
 
 	"github.com/mitchellh/cli"
 )
@@ -56,12 +55,4 @@ func InitializeMeta() {
 // Meta contain the meta-option that nearly all subcommand inherited.
 type Meta struct {
 	Ui cli.Ui
-}
-
-func (m *Meta) TrimPortFromHost(host string) string {
-	if strings.Index(host, ":") == -1 {
-		return host
-	} else {
-		return host[:strings.Index(host, ":")]
-	}
 }
