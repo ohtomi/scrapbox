@@ -21,10 +21,6 @@ const (
 
 const (
 	userAgent = "ScrapboxGoClient/0.1.0"
-
-	apiEndPoint = "api/pages"
-
-	searchPath = "search/query?skip=%d&sort=updated&limit=%d&q=%s"
 )
 
 func EncodeURIComponent(component string) string {
@@ -35,13 +31,34 @@ func EncodeURIComponent(component string) string {
 	return plusEscaped
 }
 
+func buildQueryPath(project string, tags []string, skip, limit int) string {
+	params := fmt.Sprintf("skip=%d&sort=updated&limit=%d&q=%s", skip, limit, EncodeURIComponent(strings.Join(tags, " ")))
+	if len(tags) == 0 {
+		return fmt.Sprintf("api/pages/%s?%s", project, params)
+	} else {
+		return fmt.Sprintf("api/pages/%s/search/query?%s", project, params)
+	}
+}
+
+func buildPagePath(project, page string) string {
+	return fmt.Sprintf("api/pages/%s/%s", project, EncodeURIComponent(page))
+}
+
+func trimPortFromHost(host string) string {
+	if index := strings.Index(host, ":"); index == -1 {
+		return host
+	} else {
+		return host[:index]
+	}
+}
+
 func EncodeFilename(filename string) string {
 	return strings.Replace(filename, "/", "%2F", -1)
 }
 
-func OpenQueryResultFile(host, project string, tags []string, skip, limit int) (*os.File, error) {
+func createQueryResultFile(host, project string, tags []string, skip, limit int) (*os.File, error) {
 
-	directory := path.Join(ScrapboxHome, "query", host, project, path.Join(tags...))
+	directory := path.Join(ScrapboxHome, "query", trimPortFromHost(host), project, path.Join(tags...))
 	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 		return nil, err
 	}
@@ -54,9 +71,9 @@ func OpenQueryResultFile(host, project string, tags []string, skip, limit int) (
 	return fout, nil
 }
 
-func OpenPageFile(host, project, page string) (*os.File, error) {
+func createPageFile(host, project, page string) (*os.File, error) {
 
-	directory := path.Join(ScrapboxHome, "page", host, project)
+	directory := path.Join(ScrapboxHome, "page", trimPortFromHost(host), project)
 	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
 		return nil, err
 	}
@@ -128,8 +145,7 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 		pages []string
 	)
 
-	query := fmt.Sprintf(searchPath, skip, limit, EncodeURIComponent(strings.Join(tags, " ")))
-	spath := fmt.Sprintf("%s/%s/%s", apiEndPoint, project, query)
+	spath := buildQueryPath(project, tags, skip, limit)
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
 		return nil, err
@@ -146,7 +162,7 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 	}
 
 	host := (*c.URL).Host
-	fout, err := OpenQueryResultFile(host, project, tags, skip, limit)
+	fout, err := createQueryResultFile(host, project, tags, skip, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +199,7 @@ type Page struct {
 
 func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
 
-	spath := fmt.Sprintf("%s/%s/%s", apiEndPoint, project, EncodeURIComponent(page))
+	spath := buildPagePath(project, page)
 	req, err := c.newRequest(ctx, "GET", spath, nil)
 	if err != nil {
 		return nil, err
@@ -200,7 +216,7 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 	}
 
 	host := (*c.URL).Host
-	fout, err := OpenPageFile(host, project, page)
+	fout, err := createPageFile(host, project, page)
 	if err != nil {
 		return nil, err
 	}

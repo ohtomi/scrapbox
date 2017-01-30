@@ -23,8 +23,9 @@ case "$1" in
     rm -fr ./testdata
     echo
     echo running debug mode to dump api reponse ...
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox list go-scrapbox
     env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox list go-scrapbox english
-    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox list go-scrapbox japanese
+    env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox list go-scrapbox english no-slash no-paren no-plus no-question
     env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "title having paren ( ) mark"
     env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "title having plus + mark"
     env SCRAPBOX_HOME="`pwd`/testdata" ./scrapbox read go-scrapbox "title having question ? mark"
