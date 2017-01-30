@@ -88,7 +88,7 @@ func (c *ReadCommand) Run(args []string) int {
 	}
 
 	for _, l := range lines {
-		c.Ui.Info(l)
+		c.Ui.Output(l)
 	}
 
 	return int(ExitCodeOK)

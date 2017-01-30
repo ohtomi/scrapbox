@@ -14,8 +14,9 @@ func Run(args []string) int {
 	// It defines output color and its stdout/stderr stream.
 	meta := &command.Meta{
 		Ui: &cli.ColoredUi{
-			InfoColor:  cli.UiColorBlue,
-			ErrorColor: cli.UiColorRed,
+			OutputColor: cli.UiColorNone,
+			InfoColor:   cli.UiColorBlue,
+			ErrorColor:  cli.UiColorRed,
 			Ui: &cli.BasicUi{
 				Writer:      os.Stdout,
 				ErrorWriter: os.Stderr,

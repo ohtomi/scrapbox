@@ -88,7 +88,7 @@ func (c *LinkCommand) Run(args []string) int {
 	}
 
 	for _, u := range linkURLs {
-		c.Ui.Info(u)
+		c.Ui.Output(u)
 	}
 
 	return int(ExitCodeOK)

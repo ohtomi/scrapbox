@@ -84,7 +84,7 @@ func (c *ListCommand) Run(args []string) int {
 	}
 
 	for _, p := range relatedPages {
-		c.Ui.Info(p)
+		c.Ui.Output(p)
 	}
 
 	return int(ExitCodeOK)

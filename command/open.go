@@ -66,7 +66,7 @@ func (c *OpenCommand) Run(args []string) int {
 	// process
 
 	pageURL := c.BuildPageURL(host, project, page)
-	c.Ui.Info(pageURL)
+	c.Ui.Output(pageURL)
 
 	return int(ExitCodeOK)
 }
