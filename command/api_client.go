@@ -173,7 +173,22 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 	}
 
 	for _, p := range v.(interface{}).(map[string]interface{})["pages"].([]interface{}) {
-		pages = append(pages, p.(map[string]interface{})["title"].(interface{}).(string))
+		if len(tags) > 0 {
+			for _, s := range p.(map[string]interface{})["snipet"].([]interface{}) {
+				all := true
+				for _, t := range tags {
+					all = all &&
+						(strings.Contains(strings.ToLower(s.(string)), fmt.Sprintf("<b>%s</b>", strings.ToLower(t))) ||
+							strings.Contains(strings.ToLower(p.(map[string]interface{})["title"].(interface{}).(string)), strings.ToLower(t)))
+				}
+				if all {
+					pages = append(pages, p.(map[string]interface{})["title"].(interface{}).(string))
+					break
+				}
+			}
+		} else {
+			pages = append(pages, p.(map[string]interface{})["title"].(interface{}).(string))
+		}
 	}
 
 	count = int(v.(interface{}).(map[string]interface{})["count"].(float64))

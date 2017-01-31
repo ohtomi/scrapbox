@@ -155,7 +155,32 @@ func TestListCommand__find_by_project_and_many_keywords(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english no-slash no-paren no-plus no-question", " ")
+	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english paren", " ")
+	exitStatus := command.Run(args)
+	if ExitCode(exitStatus) != ExitCodeOK {
+		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
+	}
+
+	expected := "title having paren ( ) mark"
+	if !strings.Contains(outStream.String(), expected) {
+		t.Fatalf("Output is %q, but want %q", outStream.String(), expected)
+	}
+}
+
+func TestListCommand__find_by_project_and_non_tag_keyword(t *testing.T) {
+
+	InitializeMeta()
+
+	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
+	meta := NewTestMeta(outStream, errStream, inStream)
+	command := &ListCommand{
+		Meta: *meta,
+	}
+
+	testAPIServer := RunAPIServer()
+	defer testAPIServer.Close()
+
+	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english whitespaces", " ")
 	exitStatus := command.Run(args)
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
