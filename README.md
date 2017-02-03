@@ -29,17 +29,6 @@ title having whitespaces
 $ scrapbox list go-scrapbox english paren
 title having paren ( ) mark
 
-$ scrapbox list --tags go-scrapbox english
-title having paren ( ) mark --- #english #no-url #whitespace #no-slash #paren #no-plus #no-question
-title having plus + mark --- #english #no-url #whitespace #no-slash #no-paren #plus #no-question
-title having question ? mark --- #english #no-url #whitespace #no-slash #no-paren #no-plus #question
-title having slash / mark --- #english #no-url #whitespace #slash #no-paren #no-plus #no-question
-title having whitespaces --- #english #no-url #whitespace #no-slash #no-paren #no-plus #no-question
-
-$ scrapbox read --no-cache go-scrapbox "title having paren ( ) mark"
-title having paren ( ) mark
-#english #no-url #whitespace #no-slash #paren #no-plus #no-question
-
 $ scrapbox open go-scrapbox "title having paren ( ) mark"
 https://scrapbox.io/go-scrapbox/title%20having%20paren%20(%20)%20mark
 
@@ -52,6 +41,7 @@ https://www.google.com
 
 - `SCRAPBOX_TOKEN`: specify `token` instead of `--token` option.
 - `SCRAPBOX_HOST`: specify `host` instead of `--host` option.
+- `SCRAPBOX_EXPIRATION`: specify `expire` instead of `--expire` option.
 
 ### Private Project
 
@@ -67,6 +57,14 @@ To access Scrapbox Enterprise, use `--host` option:
 
 ```bash
 $ scrapbox <sub command> --host http://host:port <arguments>
+```
+
+### Local Cache Control
+
+To ignore local caches, set `expire` to zero:
+
+```bash
+$ scrapbox <sub command> --expire <expiration> <arguments>
 ```
 
 ## Install
