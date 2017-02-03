@@ -13,10 +13,12 @@ import (
 	"path"
 	"regexp"
 	"strings"
+	"time"
 )
 
 const (
-	DefaultHost = "https://scrapbox.io"
+	DefaultHost       = "https://scrapbox.io"
+	DefaultExpiration = 60 * 60 * time.Second
 )
 
 const (
@@ -71,6 +73,36 @@ func createQueryResultFile(host, project string, tags []string, skip, limit int)
 	return fout, nil
 }
 
+func haveGoodQueryResultFile(host, project string, tags []string, skip, limit int, expiration time.Duration) bool {
+
+	directory := path.Join(ScrapboxHome, "query", trimPortFromHost(host), project, path.Join(tags...))
+	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
+	finfo, err := os.Stat(filepath)
+	if err != nil {
+		return false
+	}
+	if finfo.IsDir() {
+		return false
+	}
+	mod := finfo.ModTime()
+	now := time.Now()
+	duration := now.Sub(mod)
+
+	return duration <= expiration
+}
+
+func openQueryResultFile(host, project string, tags []string, skip, limit int) (*os.File, error) {
+
+	directory := path.Join(ScrapboxHome, "query", trimPortFromHost(host), project, path.Join(tags...))
+	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
+	fin, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	return fin, nil
+}
+
 func createPageFile(host, project, page string) (*os.File, error) {
 
 	directory := path.Join(ScrapboxHome, "page", trimPortFromHost(host), project)
@@ -84,6 +116,36 @@ func createPageFile(host, project, page string) (*os.File, error) {
 	}
 
 	return fout, nil
+}
+
+func haveGoodPageFile(host, project, page string, expiration time.Duration) bool {
+
+	directory := path.Join(ScrapboxHome, "page", trimPortFromHost(host), project)
+	filepath := path.Join(directory, EncodeFilename(page))
+	finfo, err := os.Stat(filepath)
+	if err != nil {
+		return false
+	}
+	if finfo.IsDir() {
+		return false
+	}
+	mod := finfo.ModTime()
+	now := time.Now()
+	duration := now.Sub(mod)
+
+	return duration <= expiration
+}
+
+func openPageFile(host, project, page string) (*os.File, error) {
+
+	directory := path.Join(ScrapboxHome, "page", trimPortFromHost(host), project)
+	filepath := path.Join(directory, EncodeFilename(page))
+	fin, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	return fin, nil
 }
 
 type Client struct {
@@ -133,6 +195,12 @@ func (c *Client) decodeBody(resp *http.Response, out interface{}, f *os.File) er
 	return decoder.Decode(out)
 }
 
+func (c *Client) decodeFromFile(resp *os.File, out interface{}) error {
+	defer resp.Close()
+	decoder := json.NewDecoder(resp)
+	return decoder.Decode(out)
+}
+
 type QueryResult struct {
 	Count int
 	Pages []string
@@ -143,33 +211,45 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 	var (
 		count int
 		pages []string
+
+		v interface{}
 	)
 
-	spath := buildQueryPath(project, tags, skip, limit)
-	req, err := c.newRequest(ctx, "GET", spath, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	// Check status code here…
-	if res.StatusCode != 200 {
-		return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
-	}
-
 	host := (*c.URL).Host
-	fout, err := createQueryResultFile(host, project, tags, skip, limit)
-	if err != nil {
-		return nil, err
-	}
+	expiration := DefaultExpiration // TODO
+	if haveGoodQueryResultFile(host, project, tags, skip, limit, expiration) {
+		res, err := openQueryResultFile(host, project, tags, skip, limit)
+		if err != nil {
+			return nil, err
+		}
+		if err := c.decodeFromFile(res, &v); err != nil {
+			return nil, err
+		}
+	} else {
+		spath := buildQueryPath(project, tags, skip, limit)
+		req, err := c.newRequest(ctx, "GET", spath, nil)
+		if err != nil {
+			return nil, err
+		}
 
-	var v interface{}
-	if err := c.decodeBody(res, &v, fout); err != nil {
-		return nil, err
+		res, err := c.HTTPClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+
+		// Check status code here…
+		if res.StatusCode != 200 {
+			return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
+		}
+
+		fout, err := createQueryResultFile(host, project, tags, skip, limit)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := c.decodeBody(res, &v, fout); err != nil {
+			return nil, err
+		}
 	}
 
 	for _, p := range v.(interface{}).(map[string]interface{})["pages"].([]interface{}) {
@@ -214,31 +294,45 @@ type Page struct {
 
 func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, error) {
 
-	spath := buildPagePath(project, page)
-	req, err := c.newRequest(ctx, "GET", spath, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	res, err := c.HTTPClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	// Check status code here…
-	if res.StatusCode != 200 {
-		return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
-	}
+	var (
+		v interface{}
+	)
 
 	host := (*c.URL).Host
-	fout, err := createPageFile(host, project, page)
-	if err != nil {
-		return nil, err
-	}
+	expiration := DefaultExpiration // TODO
+	if haveGoodPageFile(host, project, page, expiration) {
+		res, err := openPageFile(host, project, page)
+		if err != nil {
+			return nil, err
+		}
+		if err := c.decodeFromFile(res, &v); err != nil {
+			return nil, err
+		}
+	} else {
+		spath := buildPagePath(project, page)
+		req, err := c.newRequest(ctx, "GET", spath, nil)
+		if err != nil {
+			return nil, err
+		}
 
-	var v interface{}
-	if err := c.decodeBody(res, &v, fout); err != nil {
-		return nil, err
+		res, err := c.HTTPClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+
+		// Check status code here…
+		if res.StatusCode != 200 {
+			return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
+		}
+
+		fout, err := createPageFile(host, project, page)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := c.decodeBody(res, &v, fout); err != nil {
+			return nil, err
+		}
 	}
 
 	title := v.(interface{}).(map[string]interface{})["title"].(string)

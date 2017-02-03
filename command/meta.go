@@ -27,8 +27,9 @@ const (
 )
 
 const (
-	EnvHome  = "SCRAPBOX_HOME"
-	EnvDebug = "SCRAPBOX_DEBUG"
+	EnvHome       = "SCRAPBOX_HOME"
+	EnvDebug      = "SCRAPBOX_DEBUG"
+	EnvExpiration = "SCRAPBOX_EXPIRATION"
 )
 
 var ScrapboxHome string
