@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,6 +13,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 const (
@@ -62,12 +63,12 @@ func createQueryResultFile(host, project string, tags []string, skip, limit int)
 
 	directory := path.Join(ScrapboxHome, "query", trimPortFromHost(host), project, path.Join(tags...))
 	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to make query cache directory")
 	}
 	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
 	fout, err := os.Create(filepath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create query cache file")
 	}
 
 	return fout, nil
@@ -97,7 +98,7 @@ func openQueryResultFile(host, project string, tags []string, skip, limit int) (
 	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
 	fin, err := os.Open(filepath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open query cache file")
 	}
 
 	return fin, nil
@@ -107,12 +108,12 @@ func createPageFile(host, project, page string) (*os.File, error) {
 
 	directory := path.Join(ScrapboxHome, "page", trimPortFromHost(host), project)
 	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to make page cache directory")
 	}
 	filepath := path.Join(directory, EncodeFilename(page))
 	fout, err := os.Create(filepath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to create page cache file")
 	}
 
 	return fout, nil
@@ -142,7 +143,7 @@ func openPageFile(host, project, page string) (*os.File, error) {
 	filepath := path.Join(directory, EncodeFilename(page))
 	fin, err := os.Open(filepath)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to open page cache file")
 	}
 
 	return fin, nil
@@ -173,7 +174,7 @@ func (c *Client) newRequest(ctx context.Context, method, spath string, body io.R
 
 	req, err := http.NewRequest(method, u, body)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to instantiate http request")
 	}
 
 	req = req.WithContext(ctx)

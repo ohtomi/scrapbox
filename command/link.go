@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 type LinkCommand struct {
@@ -17,7 +19,7 @@ func (c *LinkCommand) FetchAllLinks(client *Client, project, page string) ([]str
 
 	p, err := client.GetPage(context.Background(), project, page)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get page")
 	}
 
 	return p.ExtractExternalLinks(), nil

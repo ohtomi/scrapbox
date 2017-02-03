@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 type ListCommand struct {
@@ -17,7 +19,7 @@ func (c *ListCommand) FetchRelatedPages(client *Client, project string, tags []s
 
 	q, err := client.ExecQuery(context.Background(), project, tags, 0, 100)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to execute query")
 	}
 
 	return q.Pages, nil
@@ -67,7 +69,7 @@ func (c *ListCommand) Run(args []string) int {
 
 	parsedURL, err := url.ParseRequestURI(host)
 	if err != nil {
-		c.Ui.Error("failed to parse url: " + host)
+		c.Ui.Error(fmt.Sprintf("failed to parse the url. host: %s, cause: %s", host, err))
 		return int(ExitCodeInvalidURL)
 	}
 
