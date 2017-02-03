@@ -3,6 +3,7 @@ package command
 import (
 	"os"
 	"path"
+	"strconv"
 
 	"github.com/mitchellh/cli"
 )
@@ -10,6 +11,7 @@ import (
 const (
 	EnvScrapboxToken = "SCRAPBOX_TOKEN"
 	EnvScrapboxHost  = "SCRAPBOX_HOST"
+	EnvExpiration    = "SCRAPBOX_EXPIRATION"
 )
 
 type ExitCode int
@@ -27,9 +29,8 @@ const (
 )
 
 const (
-	EnvHome       = "SCRAPBOX_HOME"
-	EnvDebug      = "SCRAPBOX_DEBUG"
-	EnvExpiration = "SCRAPBOX_EXPIRATION"
+	EnvHome  = "SCRAPBOX_HOME"
+	EnvDebug = "SCRAPBOX_DEBUG"
 )
 
 var ScrapboxHome string
@@ -43,6 +44,14 @@ func InitializeMeta() {
 	}
 
 	DebugMode = os.Getenv(EnvDebug) != ""
+}
+
+func EnvToInt(name string, value int) int {
+	parsedInt, err := strconv.Atoi(os.Getenv(name))
+	if err != nil {
+		return value
+	}
+	return parsedInt
 }
 
 // Meta contain the meta-option that nearly all subcommand inherited.

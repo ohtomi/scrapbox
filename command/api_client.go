@@ -18,7 +18,7 @@ import (
 
 const (
 	DefaultHost       = "https://scrapbox.io"
-	DefaultExpiration = 60 * 60 * time.Second
+	DefaultExpiration = 60 * 60 // time.Second
 )
 
 const (
@@ -152,15 +152,17 @@ type Client struct {
 	URL        *url.URL
 	HTTPClient *http.Client
 
-	Token string
+	Token      string
+	Expiration time.Duration
 }
 
-func NewClient(url *url.URL, token string) (*Client, error) {
+func NewClient(url *url.URL, token string, expiration int) (*Client, error) {
 	// TODO proxy, ssl, timeout
 	return &Client{
 		URL:        url,
 		HTTPClient: &http.Client{},
 		Token:      token,
+		Expiration: time.Duration(expiration) * time.Second,
 	}, nil
 }
 
@@ -216,7 +218,7 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 	)
 
 	host := (*c.URL).Host
-	expiration := DefaultExpiration // TODO
+	expiration := c.Expiration
 	if haveGoodQueryResultFile(host, project, tags, skip, limit, expiration) {
 		res, err := openQueryResultFile(host, project, tags, skip, limit)
 		if err != nil {
@@ -299,7 +301,7 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 	)
 
 	host := (*c.URL).Host
-	expiration := DefaultExpiration // TODO
+	expiration := c.Expiration
 	if haveGoodPageFile(host, project, page, expiration) {
 		res, err := openPageFile(host, project, page)
 		if err != nil {

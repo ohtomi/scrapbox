@@ -29,8 +29,9 @@ func (c *ReadCommand) Run(args []string) int {
 		project string
 		page    string
 
-		token string
-		host  string
+		token      string
+		host       string
+		expiration int
 	)
 
 	flags := flag.NewFlagSet("read", flag.ContinueOnError)
@@ -42,6 +43,7 @@ func (c *ReadCommand) Run(args []string) int {
 	flags.StringVar(&token, "t", os.Getenv(EnvScrapboxToken), "")
 	flags.StringVar(&host, "host", os.Getenv(EnvScrapboxHost), "")
 	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
+	flags.IntVar(&expiration, "expire", EnvToInt(EnvExpiration, DefaultExpiration), "")
 
 	if err := flags.Parse(args); err != nil {
 		return int(ExitCodeParseFlagsError)
@@ -75,7 +77,7 @@ func (c *ReadCommand) Run(args []string) int {
 
 	// process
 
-	client, err := NewClient(parsedURL, token)
+	client, err := NewClient(parsedURL, token, expiration)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to initialize api client. cause: %s", err))
 		return int(ExitCodeError)
@@ -104,6 +106,7 @@ func (c *ReadCommand) Help() string {
 Options:
   --token, -t  Scrapbox connect.sid used to access private project.
 	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+  --expire     Local Cache Expiration. By default, 3600 seconds.
 `
 	return strings.TrimSpace(helpText)
 }

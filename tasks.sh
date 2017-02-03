@@ -53,7 +53,7 @@ case "$1" in
     rm -fr ~/.scrapbox
     echo
     echo testing ...
-    env SCRAPBOX_HOME="`pwd`/testdata" go test github.com/ohtomi/scrapbox/command -v
+    env SCRAPBOX_HOME="`pwd`/testdata" SCRAPBOX_EXPIRATION=1 go test github.com/ohtomi/scrapbox/command -v
     ;;
   "install")
     go install \
