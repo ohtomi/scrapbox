@@ -20,7 +20,8 @@ case "$1" in
     stringer -type ExitCode -output meta_exitcode_string.go meta.go
     ;;
   "build")
-    go build -v
+    go build -v \
+      -ldflags "-X main.GitCommit=$(git describe --always)"
     ;;
   "prep")
     echo cleaning up ./testdata ...
@@ -55,7 +56,8 @@ case "$1" in
     env SCRAPBOX_HOME="`pwd`/testdata" go test github.com/ohtomi/scrapbox/command -v
     ;;
   "install")
-    go install
+    go install \
+      -ldflags "-X main.GitCommit=$(git describe --always)"
     ;;
   "package")
     $0 stringer
