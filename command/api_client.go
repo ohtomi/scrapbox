@@ -158,7 +158,6 @@ type Client struct {
 }
 
 func NewClient(url *url.URL, token string, expiration int) (*Client, error) {
-	// TODO proxy, ssl, timeout
 	return &Client{
 		URL:        url,
 		HTTPClient: &http.Client{},
