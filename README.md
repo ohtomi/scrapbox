@@ -4,6 +4,8 @@ This tool provides command line interface for scrapbox.io.
 
 ## Description
 
+This is a tool to search pages by keywords, to print a content of a page, to print an encoded URL of a page, to print URLs linked by a page. 
+
 ## Usage
 
 ```bash
@@ -28,6 +30,10 @@ title having whitespaces
 
 $ scrapbox list go-scrapbox english paren
 title having paren ( ) mark
+
+$ scrapbox read go-scrapbox "title having paren ( ) mark"
+title having paren ( ) mark
+#english #no-url #whitespace #no-slash #paren #no-plus #no-question
 
 $ scrapbox open go-scrapbox "title having paren ( ) mark"
 https://scrapbox.io/go-scrapbox/title%20having%20paren%20(%20)%20mark
@@ -74,6 +80,8 @@ To install, use `go get`:
 ```bash
 $ go get -d github.com/ohtomi/scrapbox
 ```
+
+Or get binary from [release page](../../releases/latest).
 
 ## Contribution
 
