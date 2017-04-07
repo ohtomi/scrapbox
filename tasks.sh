@@ -1,8 +1,11 @@
 #!/bin/bash
 
+MAIN_PACKAGE=.
+REL_TO_ROOT=.
+
 function usage() {
   echo "
-Usage: $0 [fmt|stringer|build|prep|test|install|package|release]
+Usage: $0 [fmt|stringer|compile|prep|test|package|release]
 "
 }
 
@@ -19,9 +22,15 @@ case "$1" in
     cd command
     stringer -type ExitCode -output meta_exitcode_string.go meta.go
     ;;
-  "build")
-    go build -v \
-      -ldflags "-X main.GitCommit=$(git describe --always)"
+  "compile")
+    $0 stringer
+
+    cd $MAIN_PACKAGE
+    gox \
+      -ldflags "-X main.GitCommit=$(git describe --always)" \
+      -os="darwin" \
+      -arch="amd64" \
+      -output "${REL_TO_ROOT}/pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"
     ;;
   "prep")
     echo cleaning up ./testdata ...
@@ -53,24 +62,22 @@ case "$1" in
     rm -fr ~/.scrapbox
     echo
     echo testing ...
-    env SCRAPBOX_HOME="`pwd`/testdata" SCRAPBOX_EXPIRATION=1 go test github.com/ohtomi/scrapbox/command -v
-    ;;
-  "install")
-    go install \
-      -ldflags "-X main.GitCommit=$(git describe --always)"
+    env SCRAPBOX_HOME="`pwd`/testdata" SCRAPBOX_EXPIRATION=1 go test ./... -v
     ;;
   "package")
     $0 stringer
 
-    rm -fr ./pkg
+    cd $MAIN_PACKAGE
+    rm -fr ${REL_TO_ROOT}/pkg
     gox \
       -ldflags "-X main.GitCommit=$(git describe --always)" \
       -os="darwin linux windows" \
       -arch="386 amd64" \
-      -output "pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"
+      -output "${REL_TO_ROOT}/pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"
 
     repo=$(grep "const Name " version.go | sed -E 's/.*"(.+)"$/\1/')
     version=$(grep "const Version " version.go | sed -E 's/.*"(.+)"$/\1/')
+    cd $REL_TO_ROOT
 
     rm -fr ./dist/${version}
     mkdir -p ./dist/${version}
@@ -87,7 +94,7 @@ case "$1" in
     popd
     ;;
   "release")
-    version=$(grep "const Version " version.go | sed -E 's/.*"(.+)"$/\1/')
+    version=$(grep "const Version " ${MAIN_PACKAGE}/version.go | sed -E 's/.*"(.+)"$/\1/')
     ghr ${version} ./dist/${version}
     ;;
   *)
