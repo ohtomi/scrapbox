@@ -2,3 +2,5 @@
 pkg/
 dist/
 testdata/
+
+.idea/
