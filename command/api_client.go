@@ -56,7 +56,9 @@ func trimPortFromHost(host string) string {
 }
 
 func EncodeFilename(filename string) string {
-	return strings.Replace(filename, "/", "%2F", -1)
+	slashEscaped := strings.Replace(filename, "/", "%2F", -1)
+	colonEscaped := strings.Replace(slashEscaped, ":", "%3A", -1)
+	return colonEscaped
 }
 
 func createQueryResultFile(host, project string, tags []string, skip, limit int) (*os.File, error) {

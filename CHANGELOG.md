@@ -1,3 +1,9 @@
+## 0.2.1 (2017-04-10)
+
+### Changed
+
+- Escape :(colon) of filename of local cache for Windows
+
 ## 0.2.0 (2017-02-04)
 
 ### Added
