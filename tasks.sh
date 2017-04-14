@@ -3,7 +3,7 @@
 MAIN_PACKAGE=.
 REL_TO_ROOT=.
 
-TEST_ENVIRONMENT="SCRAPBOX_TRACE=1 SCRAPBOX_LONG_RUN_TEST=$3 SCRAPBOX_HOME=`pwd`/testdata SCRAPBOX_EXPIRATION=1"
+TEST_ENVIRONMENT="SCRAPBOX_DEBUG=1 SCRAPBOX_LONG_RUN_TEST=$3 SCRAPBOX_HOME=`pwd`/testdata SCRAPBOX_EXPIRATION=1"
 
 GOX_ALL_OS="darwin linux windows"
 GOX_ALL_ARCH="386 amd64"
@@ -62,11 +62,7 @@ case "$1" in
     ls -l ./testdata/page/scrapbox.io/go-scrapbox
     ;;
   "test")
-#    echo cleaning up ~/.scrapbox ...
-#    rm -fr ~/.scrapbox
-#    echo
-#    echo testing ...
-    env "${TEST_ENVIRONMENT}" go test ./... $2
+    env ${TEST_ENVIRONMENT} go test ./... $2
     ;;
   "package")
     $0 stringer
