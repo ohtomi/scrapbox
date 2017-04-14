@@ -76,8 +76,6 @@ func RunAPIServer() *httptest.Server {
 
 func TestListCommand__find_by_project_only(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &ListCommand{
@@ -113,8 +111,6 @@ title having whitespaces
 
 func TestListCommand__find_by_project_and_one_keyword(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &ListCommand{
@@ -144,8 +140,6 @@ title having whitespaces
 
 func TestListCommand__find_by_project_and_many_keywords(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &ListCommand{
@@ -168,8 +162,6 @@ func TestListCommand__find_by_project_and_many_keywords(t *testing.T) {
 }
 
 func TestListCommand__find_by_project_and_non_tag_keyword(t *testing.T) {
-
-	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)

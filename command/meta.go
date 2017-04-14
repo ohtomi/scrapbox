@@ -35,18 +35,16 @@ const (
 )
 
 var (
-	ScrapboxHome string
-
 	DebugMode       = os.Getenv(EnvDebug) != ""
 	LongRunTestMode = os.Getenv(EnvLongRunTest) != ""
 )
 
-func InitializeMeta() {
-
-	ScrapboxHome = os.Getenv(EnvHome)
-	if len(ScrapboxHome) == 0 {
-		ScrapboxHome = path.Join(os.Getenv("HOME"), ".scrapbox")
+func ScrapboxHomeFromEnv() string {
+	value := os.Getenv(EnvHome)
+	if len(value) == 0 {
+		value = path.Join(os.Getenv("HOME"), ".scrapbox")
 	}
+	return value
 }
 
 func EnvToInt(name string, value int) int {

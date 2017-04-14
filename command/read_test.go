@@ -10,8 +10,6 @@ import (
 
 func TestReadCommand__print_url_having_paren(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &ReadCommand{
@@ -34,8 +32,6 @@ func TestReadCommand__print_url_having_paren(t *testing.T) {
 }
 
 func TestReadCommand__print_url_having_plus(t *testing.T) {
-
-	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
@@ -60,8 +56,6 @@ func TestReadCommand__print_url_having_plus(t *testing.T) {
 
 func TestReadCommand__print_url_having_question(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &ReadCommand{
@@ -84,8 +78,6 @@ func TestReadCommand__print_url_having_question(t *testing.T) {
 }
 
 func TestReadCommand__print_url_having_slash(t *testing.T) {
-
-	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
@@ -110,8 +102,6 @@ func TestReadCommand__print_url_having_slash(t *testing.T) {
 
 func TestReadCommand__print_url_having_whitespace(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &ReadCommand{
@@ -134,8 +124,6 @@ func TestReadCommand__print_url_having_whitespace(t *testing.T) {
 }
 
 func TestReadCommand__print_url_having_japanese(t *testing.T) {
-
-	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)

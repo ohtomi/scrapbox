@@ -10,8 +10,6 @@ import (
 
 func TestLinkCommand__print_http_link(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &LinkCommand{
@@ -34,8 +32,6 @@ func TestLinkCommand__print_http_link(t *testing.T) {
 }
 
 func TestLinkCommand__print_https_link(t *testing.T) {
-
-	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
@@ -60,8 +56,6 @@ func TestLinkCommand__print_https_link(t *testing.T) {
 
 func TestLinkCommand__print_link_with_name_1(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &LinkCommand{
@@ -84,8 +78,6 @@ func TestLinkCommand__print_link_with_name_1(t *testing.T) {
 }
 
 func TestLinkCommand__print_link_with_name_2(t *testing.T) {
-
-	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
@@ -110,8 +102,6 @@ func TestLinkCommand__print_link_with_name_2(t *testing.T) {
 
 func TestLinkCommand__print_multiple_links(t *testing.T) {
 
-	InitializeMeta()
-
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
 	command := &LinkCommand{
@@ -134,8 +124,6 @@ func TestLinkCommand__print_multiple_links(t *testing.T) {
 }
 
 func TestLinkCommand__print_no_links(t *testing.T) {
-
-	InitializeMeta()
 
 	outStream, errStream, inStream := new(bytes.Buffer), new(bytes.Buffer), strings.NewReader("")
 	meta := NewTestMeta(outStream, errStream, inStream)
