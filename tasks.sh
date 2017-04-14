@@ -3,16 +3,20 @@
 MAIN_PACKAGE=.
 REL_TO_ROOT=.
 
+TEST_ENVIRONMENT="SCRAPBOX_TRACE=1 SCRAPBOX_LONG_RUN_TEST=$3 SCRAPBOX_HOME=`pwd`/testdata SCRAPBOX_EXPIRATION=1"
+
+GOX_ALL_OS="darwin linux windows"
+GOX_ALL_ARCH="386 amd64"
+GOX_MAIN_OS="darwin"
+GOX_MAIN_ARCH="amd64"
+
+
 function usage() {
   echo "
 Usage: $0 [fmt|stringer|compile|prep|test|package|release]
 "
 }
 
-if [ $# -ne 1 ]; then
-  usage
-  exit 1
-fi
 
 case "$1" in
   "fmt")
@@ -25,11 +29,11 @@ case "$1" in
   "compile")
     $0 stringer
 
-    cd $MAIN_PACKAGE
+    cd "${MAIN_PACKAGE}"
     gox \
       -ldflags "-X main.GitCommit=$(git describe --always)" \
-      -os="darwin" \
-      -arch="amd64" \
+      -os="${GOX_MAIN_OS}" \
+      -arch="${GOX_MAIN_ARCH}" \
       -output "${REL_TO_ROOT}/pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"
     ;;
   "prep")
@@ -58,44 +62,44 @@ case "$1" in
     ls -l ./testdata/page/scrapbox.io/go-scrapbox
     ;;
   "test")
-    echo cleaning up ~/.scrapbox ...
-    rm -fr ~/.scrapbox
-    echo
-    echo testing ...
-    env SCRAPBOX_HOME="`pwd`/testdata" SCRAPBOX_EXPIRATION=1 go test ./... -v
+#    echo cleaning up ~/.scrapbox ...
+#    rm -fr ~/.scrapbox
+#    echo
+#    echo testing ...
+    env "${TEST_ENVIRONMENT}" go test ./... $2
     ;;
   "package")
     $0 stringer
 
-    cd $MAIN_PACKAGE
-    rm -fr ${REL_TO_ROOT}/pkg
+    cd "${MAIN_PACKAGE}"
+    rm -fr "${REL_TO_ROOT}/pkg"
     gox \
       -ldflags "-X main.GitCommit=$(git describe --always)" \
-      -os="darwin linux windows" \
-      -arch="386 amd64" \
+      -os="${GOX_ALL_OS}" \
+      -arch="${GOX_ALL_ARCH}" \
       -output "${REL_TO_ROOT}/pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"
 
     repo=$(grep "const Name " version.go | sed -E 's/.*"(.+)"$/\1/')
     version=$(grep "const Version " version.go | sed -E 's/.*"(.+)"$/\1/')
-    cd $REL_TO_ROOT
+    cd "${REL_TO_ROOT}"
 
-    rm -fr ./dist/${version}
-    mkdir -p ./dist/${version}
+    rm -fr "./dist/${version}"
+    mkdir -p "./dist/${version}"
     for platform in $(find ./pkg -mindepth 1 -maxdepth 1 -type d); do
       platform_name=$(basename ${platform})
       archive_name=${repo}_${version}_${platform_name}
-      pushd ${platform}
-      zip ../../dist/${version}/${archive_name}.zip ./*
+      pushd "${platform}"
+      zip "../../dist/${version}/${archive_name}.zip" ./*
       popd
     done
 
-    pushd ./dist/${version}
-    shasum -a 256 * > ./${version}_SHASUMS
+    pushd "./dist/${version}"
+    shasum -a 256 * > "./${version}_SHASUMS"
     popd
     ;;
   "release")
     version=$(grep "const Version " ${MAIN_PACKAGE}/version.go | sed -E 's/.*"(.+)"$/\1/')
-    ghr ${version} ./dist/${version}
+    ghr "${version}" "./dist/${version}"
     ;;
   *)
     usage
