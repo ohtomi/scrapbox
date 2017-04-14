@@ -18,6 +18,12 @@ func TestOpenCommand__print_url_having_paren(t *testing.T) {
 
 	args := strings.Split("go-scrapbox  title having paren ( ) mark", "  ")
 	exitStatus := command.Run(args)
+
+	if DebugMode {
+		t.Log(outStream.String())
+		t.Log(errStream.String())
+	}
+
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
@@ -38,6 +44,12 @@ func TestOpenCommand__print_url_having_plus(t *testing.T) {
 
 	args := strings.Split("go-scrapbox  title having plus + mark", "  ")
 	exitStatus := command.Run(args)
+
+	if DebugMode {
+		t.Log(outStream.String())
+		t.Log(errStream.String())
+	}
+
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
@@ -58,6 +70,12 @@ func TestOpenCommand__print_url_having_question(t *testing.T) {
 
 	args := strings.Split("go-scrapbox  title having question ? mark", "  ")
 	exitStatus := command.Run(args)
+
+	if DebugMode {
+		t.Log(outStream.String())
+		t.Log(errStream.String())
+	}
+
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
@@ -78,6 +96,12 @@ func TestOpenCommand__print_url_having_slash(t *testing.T) {
 
 	args := strings.Split("go-scrapbox  title having slash / mark", "  ")
 	exitStatus := command.Run(args)
+
+	if DebugMode {
+		t.Log(outStream.String())
+		t.Log(errStream.String())
+	}
+
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
@@ -98,6 +122,12 @@ func TestOpenCommand__print_url_having_whitespace(t *testing.T) {
 
 	args := strings.Split("go-scrapbox  title having whitespaces", "  ")
 	exitStatus := command.Run(args)
+
+	if DebugMode {
+		t.Log(outStream.String())
+		t.Log(errStream.String())
+	}
+
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
@@ -118,6 +148,12 @@ func TestOpenCommand__print_url_having_japanese(t *testing.T) {
 
 	args := strings.Split("go-scrapbox  日本語タイトルのページ", "  ")
 	exitStatus := command.Run(args)
+
+	if DebugMode {
+		t.Log(outStream.String())
+		t.Log(errStream.String())
+	}
+
 	if ExitCode(exitStatus) != ExitCodeOK {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
