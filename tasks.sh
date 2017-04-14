@@ -62,6 +62,8 @@ case "$1" in
     ls -l ./testdata/page/scrapbox.io/go-scrapbox
     ;;
   "test")
+    rm -fr ./testdata/query/127.0.0.1
+    rm -fr ./testdata/page/127.0.0.1
     env ${TEST_ENVIRONMENT} go test ./... $2
     ;;
   "package")
