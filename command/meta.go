@@ -23,7 +23,6 @@ const (
 	ExitCodeBadArgs
 	ExitCodeInvalidURL
 	ExitCodeProjectNotFound
-	ExitCodeTagNotFound
 	ExitCodePageNotFound
 	ExitCodeFetchFailure
 )

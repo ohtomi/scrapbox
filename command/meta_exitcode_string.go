@@ -4,9 +4,9 @@ package command
 
 import "fmt"
 
-const _ExitCode_name = "ExitCodeOKExitCodeErrorExitCodeParseFlagsErrorExitCodeBadArgsExitCodeInvalidURLExitCodeProjectNotFoundExitCodeTagNotFoundExitCodePageNotFoundExitCodeFetchFailure"
+const _ExitCode_name = "ExitCodeOKExitCodeErrorExitCodeParseFlagsErrorExitCodeBadArgsExitCodeInvalidURLExitCodeProjectNotFoundExitCodePageNotFoundExitCodeFetchFailure"
 
-var _ExitCode_index = [...]uint8{0, 10, 23, 46, 61, 79, 102, 121, 141, 161}
+var _ExitCode_index = [...]uint8{0, 10, 23, 46, 61, 79, 102, 122, 142}
 
 func (i ExitCode) String() string {
 	if i < 0 || i >= ExitCode(len(_ExitCode_index)-1) {
