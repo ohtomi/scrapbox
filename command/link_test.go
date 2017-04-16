@@ -19,7 +19,7 @@ func TestLinkCommand__print_http_link(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox HTTPなリンクのあるページ", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "HTTPなリンクのあるページ"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -48,7 +48,7 @@ func TestLinkCommand__print_https_link(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox HTTPSなリンクのあるページ", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "HTTPSなリンクのあるページ"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -77,7 +77,7 @@ func TestLinkCommand__print_link_with_name_1(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox 文章のなかにリンクがあるページ1", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "文章のなかにリンクがあるページ1"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -106,7 +106,7 @@ func TestLinkCommand__print_link_with_name_2(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox 文章のなかにリンクがあるページ2", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "文章のなかにリンクがあるページ2"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -135,7 +135,7 @@ func TestLinkCommand__print_multiple_links(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox 複数のリンクがあるページ", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "複数のリンクがあるページ"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -164,7 +164,7 @@ func TestLinkCommand__print_no_links(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox 日本語タイトルのページ", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "日本語タイトルのページ"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {

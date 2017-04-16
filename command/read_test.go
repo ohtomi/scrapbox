@@ -19,7 +19,7 @@ func TestReadCommand__print_url_having_paren(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having paren ( ) mark", "  ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "title having paren ( ) mark"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -48,7 +48,7 @@ func TestReadCommand__print_url_having_plus(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having plus + mark", "  ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "title having plus + mark"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -77,7 +77,7 @@ func TestReadCommand__print_url_having_question(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having question ? mark", "  ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "title having question ? mark"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -106,7 +106,7 @@ func TestReadCommand__print_url_having_slash(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having slash / mark", "  ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "title having slash / mark"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -135,7 +135,7 @@ func TestReadCommand__print_url_having_whitespace(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  title having whitespaces", "  ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "title having whitespaces"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -164,7 +164,7 @@ func TestReadCommand__print_url_having_japanese(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host  "+testAPIServer.URL+"  go-scrapbox  日本語タイトルのページ", "  ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "日本語タイトルのページ"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {

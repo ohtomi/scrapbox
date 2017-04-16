@@ -86,7 +86,7 @@ func TestListCommand__find_by_project_only(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -127,7 +127,7 @@ func TestListCommand__find_by_project_and_one_keyword(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "english"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -162,7 +162,7 @@ func TestListCommand__find_by_project_and_many_keywords(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english paren", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "english", "paren"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -191,7 +191,7 @@ func TestListCommand__find_by_project_and_non_tag_keyword(t *testing.T) {
 	testAPIServer := RunAPIServer()
 	defer testAPIServer.Close()
 
-	args := strings.Split("--host "+testAPIServer.URL+" go-scrapbox english whitespaces", " ")
+	args := []string{"--host", testAPIServer.URL, "go-scrapbox", "english", "whitespaces"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {

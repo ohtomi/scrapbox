@@ -16,7 +16,7 @@ func TestOpenCommand__print_url_having_paren(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having paren ( ) mark", "  ")
+	args := []string{"go-scrapbox", "title having paren ( ) mark"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -42,7 +42,7 @@ func TestOpenCommand__print_url_having_plus(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having plus + mark", "  ")
+	args := []string{"go-scrapbox", "title having plus + mark"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -68,7 +68,7 @@ func TestOpenCommand__print_url_having_question(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having question ? mark", "  ")
+	args := []string{"go-scrapbox", "title having question ? mark"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -94,7 +94,7 @@ func TestOpenCommand__print_url_having_slash(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having slash / mark", "  ")
+	args := []string{"go-scrapbox", "title having slash / mark"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -120,7 +120,7 @@ func TestOpenCommand__print_url_having_whitespace(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  title having whitespaces", "  ")
+	args := []string{"go-scrapbox", "title having whitespaces"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
@@ -146,7 +146,7 @@ func TestOpenCommand__print_url_having_japanese(t *testing.T) {
 		Meta: *meta,
 	}
 
-	args := strings.Split("go-scrapbox  日本語タイトルのページ", "  ")
+	args := []string{"go-scrapbox", "日本語タイトルのページ"}
 	exitStatus := command.Run(args)
 
 	if DebugMode {
