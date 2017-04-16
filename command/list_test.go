@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/mitchellh/cli"
 )
 
@@ -97,21 +98,21 @@ func TestListCommand__find_by_project_only(t *testing.T) {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
 
-	expected :=
-		`HTTPなリンクのあるページ
-HTTPSなリンクのあるページ
-title having question ? mark
-title having plus + mark
-title having paren ( ) mark
-title having slash / mark
-文章のなかにリンクがあるページ2
-文章のなかにリンクがあるページ1
-複数のリンクがあるページ
-title having whitespaces
-日本語タイトルのページ
-`
+	expected := heredoc.Doc(`
+		HTTPなリンクのあるページ
+		HTTPSなリンクのあるページ
+		title having question ? mark
+		title having plus + mark
+		title having paren ( ) mark
+		title having slash / mark
+		文章のなかにリンクがあるページ2
+		文章のなかにリンクがあるページ1
+		複数のリンクがあるページ
+		title having whitespaces
+		日本語タイトルのページ
+	`)
 	if !strings.Contains(outStream.String(), expected) {
-		t.Fatalf("Output is %q, but want %q", outStream.String(), expected)
+		t.Fatalf("Output is \n%s\n, but want \n%s", outStream.String(), expected)
 	}
 }
 
@@ -138,15 +139,15 @@ func TestListCommand__find_by_project_and_one_keyword(t *testing.T) {
 		t.Fatalf("ExitStatus is %s, but want %s", ExitCode(exitStatus), ExitCodeOK)
 	}
 
-	expected :=
-		`title having question ? mark
-title having plus + mark
-title having paren ( ) mark
-title having slash / mark
-title having whitespaces
-`
+	expected := heredoc.Doc(`
+		title having question ? mark
+		title having plus + mark
+		title having paren ( ) mark
+		title having slash / mark
+		title having whitespaces
+	`)
 	if !strings.Contains(outStream.String(), expected) {
-		t.Fatalf("Output is %q, but want %q", outStream.String(), expected)
+		t.Fatalf("Output is \n%s\n, but want \n%s", outStream.String(), expected)
 	}
 }
 
