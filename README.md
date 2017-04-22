@@ -4,11 +4,22 @@ This tool provides command line interface for scrapbox.io.
 
 ## Description
 
-This is a tool to search pages by keywords, to print a content of a page, to print an encoded URL of a page, to print URLs linked by a page. 
+This is a tool to search pages by keywords, to print a content of a page, to print an encoded URL of a page, to print URLs linked by a page.
 
 ## Usage
 
+### List page titles containing specified tags
+
 ```bash
+$ scrapbox list -h
+usage: scrapbox list [options...] PROJECT [TAGs...]
+
+Options:
+  --token, -t  Scrapbox connect.sid used to access private project.
+  --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+  --expire     Local Cache Expiration. By default, 3600 seconds.
+
+
 $ scrapbox list go-scrapbox
 title having paren ( ) mark
 title having plus + mark
@@ -30,13 +41,50 @@ title having whitespaces
 
 $ scrapbox list go-scrapbox english paren
 title having paren ( ) mark
+```
+
+### Print the content of the scrapbox page
+
+```bash
+$ scrapbox read -h
+usage: scrapbox read [options...] PROJECT PAGE
+
+Options:
+  --token, -t  Scrapbox connect.sid used to access private project.
+	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+  --expire     Local Cache Expiration. By default, 3600 seconds.
+
 
 $ scrapbox read go-scrapbox "title having paren ( ) mark"
 title having paren ( ) mark
 #english #no-url #whitespace #no-slash #paren #no-plus #no-question
+```
+
+### Print the URL of the scrapbox page
+
+```bash
+$ scrapbox open -h
+usage: scrapbox open [options...] PROJECT PAGE
+
+Options:
+	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+
 
 $ scrapbox open go-scrapbox "title having paren ( ) mark"
 https://scrapbox.io/go-scrapbox/title%20having%20paren%20(%20)%20mark
+```
+
+### Print all URLs in the scrapbox page
+
+```bash
+$ scrapbox link -h
+usage: scrapbox link [options...] PROJECT PAGE
+
+Options:
+  --token, -t  Scrapbox connect.sid used to access private project.
+	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+  --expire     Local Cache Expiration. By default, 3600 seconds.
+
 
 $ scrapbox link go-scrapbox "複数のリンクがあるページ"
 https://www.google.co.jp
@@ -48,6 +96,9 @@ https://www.google.com
 - `SCRAPBOX_TOKEN`: specify `token` instead of `--token` option.
 - `SCRAPBOX_HOST`: specify `host` instead of `--host` option.
 - `SCRAPBOX_EXPIRATION`: specify `expire` instead of `--expire` option.
+- `SCRAPBOX_HOME`: specify `scrapbox` home directory. By default `~/.scrapbox/`
+- `SCRAPBOX_DEBUG`: whether or not print stack trace at error.
+- `SCRAPBOX_LONG_RUN_TEST`: execute long-run test.
 
 ### Private Project
 
@@ -92,6 +143,10 @@ Or get binary from [release page](../../releases/latest).
 1. Run test suite with the `go test ./...` command and confirm that it passes
 1. Run `gofmt -s`
 1. Create a new Pull Request
+
+## License
+
+MIT
 
 ## Author
 
