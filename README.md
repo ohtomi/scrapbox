@@ -10,7 +10,7 @@ This is a tool to search pages by keywords, to print a content of a page, to pri
 
 ### List page titles containing specified tags
 
-```bash
+```console
 $ scrapbox list -h
 usage: scrapbox list [options...] PROJECT [TAGs...]
 
@@ -45,7 +45,7 @@ title having paren ( ) mark
 
 ### Print the content of the scrapbox page
 
-```bash
+```console
 $ scrapbox read -h
 usage: scrapbox read [options...] PROJECT PAGE
 
@@ -62,7 +62,7 @@ title having paren ( ) mark
 
 ### Print the URL of the scrapbox page
 
-```bash
+```console
 $ scrapbox open -h
 usage: scrapbox open [options...] PROJECT PAGE
 
@@ -76,7 +76,7 @@ https://scrapbox.io/go-scrapbox/title%20having%20paren%20(%20)%20mark
 
 ### Print all URLs in the scrapbox page
 
-```bash
+```console
 $ scrapbox link -h
 usage: scrapbox link [options...] PROJECT PAGE
 
@@ -104,7 +104,7 @@ https://www.google.com
 
 To access private project, use `--token` option:
 
-```bash
+```console
 $ scrapbox <sub command> --token s%3A... <arguments>
 ```
 
@@ -112,7 +112,7 @@ $ scrapbox <sub command> --token s%3A... <arguments>
 
 To access Scrapbox Enterprise, use `--host` option:
 
-```bash
+```console
 $ scrapbox <sub command> --host http://host:port <arguments>
 ```
 
@@ -120,7 +120,7 @@ $ scrapbox <sub command> --host http://host:port <arguments>
 
 To ignore local caches, set `expire` to zero:
 
-```bash
+```console
 $ scrapbox <sub command> --expire <expiration> <arguments>
 ```
 
@@ -128,7 +128,7 @@ $ scrapbox <sub command> --expire <expiration> <arguments>
 
 To install, use `go get`:
 
-```bash
+```console
 $ go get -d github.com/ohtomi/scrapbox
 ```
 
