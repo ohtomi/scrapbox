@@ -82,7 +82,7 @@ usage: scrapbox link [options...] PROJECT PAGE
 
 Options:
   --token, -t  Scrapbox connect.sid used to access private project.
-	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+  --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
   --expire     Local Cache Expiration. By default, 3600 seconds.
 
 
