@@ -79,7 +79,7 @@ func (c *OpenCommand) Help() string {
 	helpText := `usage: scrapbox open [options...] PROJECT PAGE
 
 Options:
-	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+  --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
 `
 	return strings.TrimSpace(helpText)
 }
