@@ -51,7 +51,7 @@ usage: scrapbox read [options...] PROJECT PAGE
 
 Options:
   --token, -t  Scrapbox connect.sid used to access private project.
-	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+  --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
   --expire     Local Cache Expiration. By default, 3600 seconds.
 
 
@@ -67,7 +67,7 @@ $ scrapbox open -h
 usage: scrapbox open [options...] PROJECT PAGE
 
 Options:
-	--host, -h   Scrapbox Host. By default, "https://scrapbox.io".
+  --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
 
 
 $ scrapbox open go-scrapbox "title having paren ( ) mark"
