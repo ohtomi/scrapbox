@@ -1,4 +1,5 @@
 *.test
+vendor/
 pkg/
 dist/
 testdata/
