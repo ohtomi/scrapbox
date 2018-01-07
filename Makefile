@@ -17,8 +17,30 @@ build: stringer
 	  -arch="$(firstword $(GOX_ARCH))" \
 	  -output="$(CURDIR)/pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"
 
+prep:
+	@rm -fr ./testdata
+
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go list go-scrapbox
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go list go-scrapbox english
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go list go-scrapbox english paren
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go list go-scrapbox english whitespaces
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "title having paren ( ) mark"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "title having plus + mark"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "title having question ? mark"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "title having slash / mark"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "title having whitespaces"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "日本語タイトルのページ"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "HTTPなリンクのあるページ"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "HTTPSなリンクのあるページ"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "地のリンクがあるページ"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "複数のリンクがあるページ"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "文章のなかにリンクがあるページ1"
+	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "文章のなかにリンクがあるページ2"
+
 test:
-	go test -v -parallel=4 ${PACKAGES}
+	rm -fr ./testdata/query/127.0.0.1
+	rm -fr ./testdata/page/127.0.0.1
+	env SCRAPBOX_DEBUG=1 SCRAPBOX_LONG_RUN_TEST=1 SCRAPBOX_HOME=`pwd`/testdata SCRAPBOX_EXPIRATION=1 go test -v -parallel=4 ${PACKAGES}
 
 test-race:
 	go test -v -race ${PACKAGES}
