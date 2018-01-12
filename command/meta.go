@@ -14,19 +14,6 @@ const (
 	EnvExpiration    = "SCRAPBOX_EXPIRATION"
 )
 
-type ExitCode int
-
-const (
-	ExitCodeOK ExitCode = iota
-	ExitCodeError
-	ExitCodeParseFlagsError
-	ExitCodeBadArgs
-	ExitCodeInvalidURL
-	ExitCodeProjectNotFound
-	ExitCodePageNotFound
-	ExitCodeFetchFailure
-)
-
 const (
 	EnvHome        = "SCRAPBOX_HOME"
 	EnvDebug       = "SCRAPBOX_DEBUG"

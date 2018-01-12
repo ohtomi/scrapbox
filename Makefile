@@ -9,7 +9,7 @@ GOX_ARCH = amd64 386
 
 default: test
 
-build: stringer
+build: go-generate
 	@cd $(MAIN_PACKAGE) ; \
 	gox \
 	  -ldflags "-X main.GitCommit=$(COMMIT)" \
@@ -37,16 +37,16 @@ prep:
 	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "文章のなかにリンクがあるページ1"
 	env SCRAPBOX_HOME="`pwd`/testdata" go run ./*.go read go-scrapbox "文章のなかにリンクがあるページ2"
 
-test:
+test: go-generate
 	rm -fr ./testdata/query/127.0.0.1
 	rm -fr ./testdata/page/127.0.0.1
-	env SCRAPBOX_DEBUG=1 SCRAPBOX_LONG_RUN_TEST=1 SCRAPBOX_HOME=`pwd`/testdata SCRAPBOX_EXPIRATION=1 go test -v -parallel=4 ${PACKAGES}
+	env SCRAPBOX_DEBUG=1 SCRAPBOX_LONG_RUN_TEST=${SCRAPBOX_LONG_RUN_TEST} SCRAPBOX_HOME=`pwd`/testdata SCRAPBOX_EXPIRATION=1 go test ${VERBOSE} -parallel=4 ${PACKAGES}
 
-test-race:
-	go test -v -race ${PACKAGES}
+test-race: go-generate
+	go test ${VERBOSE} -race ${PACKAGES}
 
-vet:
-	go vet ${PACKAGES}
+vet: go-generate
+	go vet ${VERBOSE} ${PACKAGES}
 
 clean:
 	@rm -fr ./pkg
@@ -55,7 +55,7 @@ clean:
 install: clean build
 	cp "$(CURDIR)/pkg/$(firstword $(GOX_OS))_$(firstword $(GOX_ARCH))/$(REPO)" "${GOPATH}/bin"
 
-package: clean stringer
+package: clean go-generate
 	@cd $(MAIN_PACKAGE) ; \
 	gox \
 	  -ldflags "-X main.GitCommit=$(COMMIT)" \
@@ -81,8 +81,7 @@ release: package
 fmt:
 	gofmt -w .
 
-stringer:
-	@cd command ; \
-	stringer -type ExitCode -output meta_exitcode_string.go meta.go
+go-generate:
+	go generate ${VERBOSE} ${PACKAGES}
 
-.PHONY: build test test-race vet clean install package release fmt stringer
+.PHONY: build test test-race vet clean install package release fmt go-generate
