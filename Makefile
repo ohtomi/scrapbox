@@ -75,7 +75,7 @@ package: clean go-generate
 	echo "shasum -a 256 * > ./$(VERSION)_SHASUMS" ; \
 	shasum -a 256 * > ./$(VERSION)_SHASUMS
 
-release: package
+release:
 	ghr $(VERSION) ./dist/$(VERSION)
 
 fmt:
