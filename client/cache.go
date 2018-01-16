@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 )
 
@@ -107,8 +108,15 @@ func openPageFile(host, project, page string) (*os.File, error) {
 func getScrapboxHomeDir() string {
 	value := os.Getenv(EnvHome)
 	if len(value) == 0 {
-		// TODO ohtomi: use go-homedir
-		value = path.Join(os.Getenv("HOME"), ".scrapbox")
+		if userHomeDir, err := homedir.Dir(); err != nil {
+			value = path.Join(userHomeDir, ".scrapbox")
+		} else {
+			value = "./.scrapbox"
+		}
+	} else {
+		if expanded, err := homedir.Expand(value); err != nil {
+			value = expanded
+		}
 	}
 	return value
 }
