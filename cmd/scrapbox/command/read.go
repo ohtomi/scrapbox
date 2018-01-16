@@ -8,24 +8,25 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ohtomi/scrapbox/client"
 	"github.com/pkg/errors"
 )
 
-type LinkCommand struct {
+type ReadCommand struct {
 	Meta
 }
 
-func (c *LinkCommand) FetchAllLinks(client *Client, project, page string) ([]string, error) {
+func (c *ReadCommand) FetchContent(client *client.Client, project, page string) ([]string, error) {
 
 	p, err := client.GetPage(context.Background(), project, page)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get page")
 	}
 
-	return p.ExtractExternalLinks(), nil
+	return p.Lines, nil
 }
 
-func (c *LinkCommand) Run(args []string) int {
+func (c *ReadCommand) Run(args []string) int {
 
 	var (
 		project string
@@ -36,7 +37,7 @@ func (c *LinkCommand) Run(args []string) int {
 		expiration int
 	)
 
-	flags := flag.NewFlagSet("open", flag.ContinueOnError)
+	flags := flag.NewFlagSet("read", flag.ContinueOnError)
 	flags.Usage = func() {
 		c.Ui.Error(c.Help())
 	}
@@ -45,7 +46,7 @@ func (c *LinkCommand) Run(args []string) int {
 	flags.StringVar(&token, "t", os.Getenv(EnvScrapboxToken), "")
 	flags.StringVar(&host, "host", os.Getenv(EnvScrapboxHost), "")
 	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
-	flags.IntVar(&expiration, "expire", EnvToInt(EnvExpiration, DefaultExpiration), "")
+	flags.IntVar(&expiration, "expire", EnvToInt(EnvExpiration, client.DefaultExpiration), "")
 
 	if err := flags.Parse(args); err != nil {
 		return int(ExitCodeParseFlagsError)
@@ -68,7 +69,7 @@ func (c *LinkCommand) Run(args []string) int {
 	}
 
 	if len(host) == 0 {
-		host = DefaultHost
+		host = client.DefaultHost
 	}
 
 	parsedURL, err := url.ParseRequestURI(host)
@@ -79,31 +80,31 @@ func (c *LinkCommand) Run(args []string) int {
 
 	// process
 
-	client, err := NewClient(parsedURL, token, expiration)
+	client, err := client.NewClient(ScrapboxHomeFromEnv(), parsedURL, token, expiration)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to initialize api client. cause: %s", err))
 		return int(ExitCodeError)
 	}
 
-	linkURLs, err := c.FetchAllLinks(client, project, page)
+	lines, err := c.FetchContent(client, project, page)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page. cause: %s", err))
 		return int(ExitCodeFetchFailure)
 	}
 
-	for _, u := range linkURLs {
-		c.Ui.Output(u)
+	for _, l := range lines {
+		c.Ui.Output(l)
 	}
 
 	return int(ExitCodeOK)
 }
 
-func (c *LinkCommand) Synopsis() string {
-	return "Print all URLs in the scrapbox page"
+func (c *ReadCommand) Synopsis() string {
+	return "Print the content of the scrapbox page"
 }
 
-func (c *LinkCommand) Help() string {
-	helpText := `usage: scrapbox link [options...] PROJECT PAGE
+func (c *ReadCommand) Help() string {
+	helpText := `usage: scrapbox read [options...] PROJECT PAGE
 
 Options:
   --token, -t  Scrapbox connect.sid used to access private project.

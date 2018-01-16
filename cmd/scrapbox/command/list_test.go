@@ -13,6 +13,7 @@ import (
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/mitchellh/cli"
+	"github.com/ohtomi/scrapbox/client"
 )
 
 func SetTestEnv(key, newValue string) func() {
@@ -47,8 +48,8 @@ func RunAPIServer() *httptest.Server {
 		tags := strings.Split(query.Get("q"), " ")
 
 		filename := fmt.Sprintf("%s-%s", skip, limit)
-		directory := path.Join("../testdata/query/scrapbox.io/go-scrapbox", path.Join(tags...))
-		filepath := path.Join(directory, EncodeFilename(filename))
+		directory := path.Join("../../../testdata/query/scrapbox.io/go-scrapbox", path.Join(tags...))
+		filepath := path.Join(directory, client.EncodeFilename(filename))
 		http.ServeFile(w, r, filepath)
 	})
 
@@ -58,8 +59,8 @@ func RunAPIServer() *httptest.Server {
 		limit := query.Get("limit")
 
 		filename := fmt.Sprintf("%s-%s", skip, limit)
-		directory := path.Join("../testdata/query/scrapbox.io/go-scrapbox")
-		filepath := path.Join(directory, EncodeFilename(filename))
+		directory := path.Join("../../../testdata/query/scrapbox.io/go-scrapbox")
+		filepath := path.Join(directory, client.EncodeFilename(filename))
 		http.ServeFile(w, r, filepath)
 	})
 
@@ -67,8 +68,8 @@ func RunAPIServer() *httptest.Server {
 		urlPath := r.URL.Path
 
 		filename := strings.Replace(urlPath, "/api/pages/go-scrapbox/", "", -1)
-		directory := "../testdata/page/scrapbox.io/go-scrapbox"
-		filepath := path.Join(directory, EncodeFilename(filename))
+		directory := "../../../testdata/page/scrapbox.io/go-scrapbox"
+		filepath := path.Join(directory, client.EncodeFilename(filename))
 		http.ServeFile(w, r, filepath)
 	})
 

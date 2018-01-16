@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/ohtomi/scrapbox/client"
 )
 
 type OpenCommand struct {
@@ -13,7 +15,7 @@ type OpenCommand struct {
 }
 
 func (c *OpenCommand) BuildPageURL(host, project, page string) string {
-	return fmt.Sprintf("%s/%s/%s", host, project, EncodeURIComponent(page))
+	return fmt.Sprintf("%s/%s/%s", host, project, client.EncodeURIComponent(page))
 }
 
 func (c *OpenCommand) Run(args []string) int {
@@ -54,7 +56,7 @@ func (c *OpenCommand) Run(args []string) int {
 	}
 
 	if len(host) == 0 {
-		host = DefaultHost
+		host = client.DefaultHost
 	}
 
 	_, err := url.ParseRequestURI(host)

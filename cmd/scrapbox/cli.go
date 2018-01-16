@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/mitchellh/cli"
-	"github.com/ohtomi/scrapbox/command"
+	"github.com/ohtomi/scrapbox/cmd/scrapbox/command"
 )
 
 func Run(args []string) int {

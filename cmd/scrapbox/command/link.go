@@ -8,35 +8,36 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ohtomi/scrapbox/client"
 	"github.com/pkg/errors"
 )
 
-type ListCommand struct {
+type LinkCommand struct {
 	Meta
 }
 
-func (c *ListCommand) FetchRelatedPages(client *Client, project string, tags []string) ([]string, error) {
+func (c *LinkCommand) FetchAllLinks(client *client.Client, project, page string) ([]string, error) {
 
-	q, err := client.ExecQuery(context.Background(), project, tags, 0, 100)
+	p, err := client.GetPage(context.Background(), project, page)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to execute query")
+		return nil, errors.Wrap(err, "failed to get page")
 	}
 
-	return q.Pages, nil
+	return p.ExtractExternalLinks(), nil
 }
 
-func (c *ListCommand) Run(args []string) int {
+func (c *LinkCommand) Run(args []string) int {
 
 	var (
 		project string
-		tags    []string
+		page    string
 
 		token      string
 		host       string
 		expiration int
 	)
 
-	flags := flag.NewFlagSet("list", flag.ContinueOnError)
+	flags := flag.NewFlagSet("open", flag.ContinueOnError)
 	flags.Usage = func() {
 		c.Ui.Error(c.Help())
 	}
@@ -45,26 +46,30 @@ func (c *ListCommand) Run(args []string) int {
 	flags.StringVar(&token, "t", os.Getenv(EnvScrapboxToken), "")
 	flags.StringVar(&host, "host", os.Getenv(EnvScrapboxHost), "")
 	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
-	flags.IntVar(&expiration, "expire", EnvToInt(EnvExpiration, DefaultExpiration), "")
+	flags.IntVar(&expiration, "expire", EnvToInt(EnvExpiration, client.DefaultExpiration), "")
 
 	if err := flags.Parse(args); err != nil {
 		return int(ExitCodeParseFlagsError)
 	}
 
 	parsedArgs := flags.Args()
-	if len(parsedArgs) < 1 {
-		c.Ui.Error("you must set PROJECT.")
+	if len(parsedArgs) != 2 {
+		c.Ui.Error("you must set PROJECT and PAGE.")
 		return int(ExitCodeBadArgs)
 	}
-	project, tags = parsedArgs[0], parsedArgs[1:]
+	project, page = parsedArgs[0], parsedArgs[1]
 
 	if len(project) == 0 {
 		c.Ui.Error("missing PROJECT.")
 		return int(ExitCodeProjectNotFound)
 	}
+	if len(page) == 0 {
+		c.Ui.Error("missing PAGE.")
+		return int(ExitCodePageNotFound)
+	}
 
 	if len(host) == 0 {
-		host = DefaultHost
+		host = client.DefaultHost
 	}
 
 	parsedURL, err := url.ParseRequestURI(host)
@@ -75,31 +80,31 @@ func (c *ListCommand) Run(args []string) int {
 
 	// process
 
-	client, err := NewClient(parsedURL, token, expiration)
+	client, err := client.NewClient(ScrapboxHomeFromEnv(), parsedURL, token, expiration)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to initialize api client. cause: %s", err))
 		return int(ExitCodeError)
 	}
 
-	relatedPages, err := c.FetchRelatedPages(client, project, tags)
+	linkURLs, err := c.FetchAllLinks(client, project, page)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to fetch the scrapbox page. cause: %s", err))
 		return int(ExitCodeFetchFailure)
 	}
 
-	for _, p := range relatedPages {
-		c.Ui.Output(p)
+	for _, u := range linkURLs {
+		c.Ui.Output(u)
 	}
 
 	return int(ExitCodeOK)
 }
 
-func (c *ListCommand) Synopsis() string {
-	return "List page titles containing specified tags"
+func (c *LinkCommand) Synopsis() string {
+	return "Print all URLs in the scrapbox page"
 }
 
-func (c *ListCommand) Help() string {
-	helpText := `usage: scrapbox list [options...] PROJECT [TAGs...]
+func (c *LinkCommand) Help() string {
+	helpText := `usage: scrapbox link [options...] PROJECT PAGE
 
 Options:
   --token, -t  Scrapbox connect.sid used to access private project.
