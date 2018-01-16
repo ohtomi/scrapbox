@@ -15,7 +15,7 @@ type OpenCommand struct {
 }
 
 func (c *OpenCommand) BuildPageURL(host, project, page string) string {
-	return fmt.Sprintf("%s/%s/%s", host, project, client.EncodeURIComponent(page))
+	return client.GetURL(host, project, page)
 }
 
 func (c *OpenCommand) Run(args []string) int {

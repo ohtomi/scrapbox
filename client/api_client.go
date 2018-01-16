@@ -25,7 +25,7 @@ const (
 	userAgent = "ScrapboxGoClient/0.1.0"
 )
 
-func EncodeURIComponent(component string) string {
+func encodeURIComponent(component string) string {
 	regularEscaped := url.QueryEscape(component)
 	rParenUnescaped := strings.Replace(regularEscaped, "%28", "(", -1)
 	lParenUnescaped := strings.Replace(rParenUnescaped, "%29", ")", -1)
@@ -34,7 +34,7 @@ func EncodeURIComponent(component string) string {
 }
 
 func buildQueryPath(project string, tags []string, skip, limit int) string {
-	params := fmt.Sprintf("skip=%d&sort=updated&limit=%d&q=%s", skip, limit, EncodeURIComponent(strings.Join(tags, " ")))
+	params := fmt.Sprintf("skip=%d&sort=updated&limit=%d&q=%s", skip, limit, encodeURIComponent(strings.Join(tags, " ")))
 	if len(tags) == 0 {
 		return fmt.Sprintf("api/pages/%s?%s", project, params)
 	} else {
@@ -43,7 +43,7 @@ func buildQueryPath(project string, tags []string, skip, limit int) string {
 }
 
 func buildPagePath(project, page string) string {
-	return fmt.Sprintf("api/pages/%s/%s", project, EncodeURIComponent(page))
+	return fmt.Sprintf("api/pages/%s/%s", project, encodeURIComponent(page))
 }
 
 func trimPortFromHost(host string) string {
@@ -296,4 +296,8 @@ func (p *Page) ExtractExternalLinks() []string {
 	}
 
 	return linkURLs
+}
+
+func GetURL(host, project, page string) string {
+	return fmt.Sprintf("%s/%s/%s", host, project, encodeURIComponent(page))
 }
