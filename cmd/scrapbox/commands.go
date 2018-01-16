@@ -17,13 +17,13 @@ func Commands(meta *command.Meta) map[string]cli.CommandFactory {
 				Meta: *meta,
 			}, nil
 		},
-		"open": func() (cli.Command, error) {
-			return &command.OpenCommand{
+		"link": func() (cli.Command, error) {
+			return &command.LinkCommand{
 				Meta: *meta,
 			}, nil
 		},
-		"link": func() (cli.Command, error) {
-			return &command.LinkCommand{
+		"open": func() (cli.Command, error) {
+			return &command.OpenCommand{
 				Meta: *meta,
 			}, nil
 		},
