@@ -18,7 +18,7 @@ import (
 const (
 	DefaultHost       = "https://scrapbox.io"
 	DefaultExpiration = 60 * 60 // time.Second
-	DefaultUserAgent  = "ScrapboxGoClient/0.1.0"
+	DefaultUserAgent  = "ScrapboxGoClient/0.3.0"
 )
 
 type Client struct {
