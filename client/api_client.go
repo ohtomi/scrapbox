@@ -27,14 +27,16 @@ type Client struct {
 
 	Token      string
 	Expiration time.Duration
+	UserAgent  string
 }
 
-func NewClient(url *url.URL, token string, expiration int) (*Client, error) {
+func NewClient(url *url.URL, token string, expiration int, userAgent string) (*Client, error) {
 	return &Client{
 		URL:        url,
 		HTTPClient: &http.Client{},
 		Token:      token,
 		Expiration: time.Duration(expiration) * time.Second,
+		UserAgent:  userAgent,
 	}, nil
 }
 
@@ -189,7 +191,7 @@ func (c *Client) newRequest(ctx context.Context, method, spath string, body io.R
 	req = req.WithContext(ctx)
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("User-Agent", DefaultUserAgent)
+	req.Header.Set("User-Agent", c.UserAgent)
 	if len(c.Token) != 0 {
 		req.Header.Set("Cookie", "connect.sid="+c.Token)
 	}

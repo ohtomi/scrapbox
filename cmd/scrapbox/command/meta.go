@@ -11,6 +11,7 @@ const (
 	EnvScrapboxToken = "SCRAPBOX_TOKEN"
 	EnvScrapboxHost  = "SCRAPBOX_HOST"
 	EnvExpiration    = "SCRAPBOX_EXPIRATION"
+	EnvUserAgent     = "SCRAPBOX_USER_AGENT"
 )
 
 const (

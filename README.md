@@ -18,6 +18,7 @@ Options:
   --token, -t  Scrapbox connect.sid used to access private project.
   --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
   --expire     Local Cache Expiration. By default, 3600 seconds.
+  --ua         User Agent. By default, "ScrapboxGoClient/x.x.x"
 
 
 $ scrapbox list go-scrapbox
@@ -53,6 +54,7 @@ Options:
   --token, -t  Scrapbox connect.sid used to access private project.
   --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
   --expire     Local Cache Expiration. By default, 3600 seconds.
+  --ua         User Agent. By default, "ScrapboxGoClient/x.x.x"
 
 
 $ scrapbox read go-scrapbox "title having paren ( ) mark"
@@ -84,6 +86,7 @@ Options:
   --token, -t  Scrapbox connect.sid used to access private project.
   --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
   --expire     Local Cache Expiration. By default, 3600 seconds.
+  --ua         User Agent. By default, "ScrapboxGoClient/x.x.x"
 
 
 $ scrapbox link go-scrapbox "複数のリンクがあるページ"
@@ -96,9 +99,8 @@ https://www.google.com
 - `SCRAPBOX_TOKEN`: specify `token` instead of `--token` option.
 - `SCRAPBOX_HOST`: specify `host` instead of `--host` option.
 - `SCRAPBOX_EXPIRATION`: specify `expire` instead of `--expire` option.
+- `SCRAPBOX_USER_AGENT`: specify `ua`(`user agent`) instead of `--ua` option.
 - `SCRAPBOX_HOME`: specify `scrapbox` home directory. By default `~/.scrapbox/`
-- `SCRAPBOX_DEBUG`: whether or not print stack trace at error.
-- `SCRAPBOX_LONG_RUN_TEST`: execute long-run test.
 
 ### Private Project
 

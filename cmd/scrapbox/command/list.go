@@ -35,6 +35,7 @@ func (c *ListCommand) Run(args []string) int {
 		token      string
 		host       string
 		expiration int
+		userAgent  string
 	)
 
 	flags := flag.NewFlagSet("list", flag.ContinueOnError)
@@ -47,6 +48,7 @@ func (c *ListCommand) Run(args []string) int {
 	flags.StringVar(&host, "host", os.Getenv(EnvScrapboxHost), "")
 	flags.StringVar(&host, "h", os.Getenv(EnvScrapboxHost), "")
 	flags.IntVar(&expiration, "expire", EnvToInt(EnvExpiration, client.DefaultExpiration), "")
+	flags.StringVar(&userAgent, "ua", os.Getenv(EnvUserAgent), "")
 
 	if err := flags.Parse(args); err != nil {
 		return int(ExitCodeParseFlagsError)
@@ -74,9 +76,13 @@ func (c *ListCommand) Run(args []string) int {
 		return int(ExitCodeInvalidURL)
 	}
 
+	if len(userAgent) == 0 {
+		userAgent = client.DefaultUserAgent
+	}
+
 	// process
 
-	client, err := client.NewClient(parsedURL, token, expiration)
+	client, err := client.NewClient(parsedURL, token, expiration, userAgent)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to initialize api client. cause: %s", err))
 		return int(ExitCodeError)
@@ -106,6 +112,7 @@ Options:
   --token, -t  Scrapbox connect.sid used to access private project.
   --host, -h   Scrapbox Host. By default, "https://scrapbox.io".
   --expire     Local Cache Expiration. By default, 3600 seconds.
+  --ua         User Agent. By default, "ScrapboxGoClient/x.x.x"
 `
 	return strings.TrimSpace(helpText)
 }

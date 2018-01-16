@@ -1,4 +1,16 @@
-## 0.2.3 (2017-04-xx)
+## 0.3.0 (2018-xx-xx)
+
+### Added
+
+- Define environmental variable
+  - `SCRAPBOX_USER_AGENT`
+
+### Changed
+
+- Restructure go packages
+- Locate user home directory correctly          -> todo go-homedir
+
+## 0.2.3 (2017-04-16)
 
 ### Added
 
