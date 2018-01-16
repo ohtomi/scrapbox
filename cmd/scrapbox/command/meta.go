@@ -2,7 +2,6 @@ package command
 
 import (
 	"os"
-	"path"
 	"strconv"
 
 	"github.com/mitchellh/cli"
@@ -15,7 +14,6 @@ const (
 )
 
 const (
-	EnvHome        = "SCRAPBOX_HOME"
 	EnvDebug       = "SCRAPBOX_DEBUG"
 	EnvLongRunTest = "SCRAPBOX_LONG_RUN_TEST"
 )
@@ -24,14 +22,6 @@ var (
 	DebugMode       = os.Getenv(EnvDebug) != ""
 	LongRunTestMode = os.Getenv(EnvLongRunTest) != ""
 )
-
-func ScrapboxHomeFromEnv() string {
-	value := os.Getenv(EnvHome)
-	if len(value) == 0 {
-		value = path.Join(os.Getenv("HOME"), ".scrapbox")
-	}
-	return value
-}
 
 func EnvToInt(name string, value int) int {
 	parsedInt, err := strconv.Atoi(os.Getenv(name))

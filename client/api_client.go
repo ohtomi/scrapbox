@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"path"
 	"regexp"
 	"strings"
 	"time"
@@ -55,106 +54,7 @@ func trimPortFromHost(host string) string {
 	}
 }
 
-func EncodeFilename(filename string) string {
-	slashEscaped := strings.Replace(filename, "/", "%2F", -1)
-	colonEscaped := strings.Replace(slashEscaped, ":", "%3A", -1)
-	pipeEscaped := strings.Replace(colonEscaped, "|", "%7C", -1)
-	return pipeEscaped
-}
-
-func createQueryResultFile(homeDir, host, project string, tags []string, skip, limit int) (*os.File, error) {
-
-	directory := path.Join(homeDir, "query", trimPortFromHost(host), project, path.Join(tags...))
-	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
-		return nil, errors.Wrap(err, "failed to make query cache directory")
-	}
-	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
-	fout, err := os.Create(filepath)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create query cache file")
-	}
-
-	return fout, nil
-}
-
-func haveGoodQueryResultFile(homeDir, host, project string, tags []string, skip, limit int, expiration time.Duration) bool {
-
-	directory := path.Join(homeDir, "query", trimPortFromHost(host), project, path.Join(tags...))
-	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
-	finfo, err := os.Stat(filepath)
-	if err != nil {
-		return false
-	}
-	if finfo.IsDir() {
-		return false
-	}
-	mod := finfo.ModTime()
-	now := time.Now()
-	duration := now.Sub(mod)
-
-	return duration <= expiration
-}
-
-func openQueryResultFile(homeDir, host, project string, tags []string, skip, limit int) (*os.File, error) {
-
-	directory := path.Join(homeDir, "query", trimPortFromHost(host), project, path.Join(tags...))
-	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
-	fin, err := os.Open(filepath)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open query cache file")
-	}
-
-	return fin, nil
-}
-
-func createPageFile(homeDir, host, project, page string) (*os.File, error) {
-
-	directory := path.Join(homeDir, "page", trimPortFromHost(host), project)
-	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
-		return nil, errors.Wrap(err, "failed to make page cache directory")
-	}
-	filepath := path.Join(directory, EncodeFilename(page))
-	fout, err := os.Create(filepath)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create page cache file")
-	}
-
-	return fout, nil
-}
-
-func haveGoodPageFile(homeDir, host, project, page string, expiration time.Duration) bool {
-
-	directory := path.Join(homeDir, "page", trimPortFromHost(host), project)
-	filepath := path.Join(directory, EncodeFilename(page))
-	finfo, err := os.Stat(filepath)
-	if err != nil {
-		return false
-	}
-	if finfo.IsDir() {
-		return false
-	}
-	mod := finfo.ModTime()
-	now := time.Now()
-	duration := now.Sub(mod)
-
-	return duration <= expiration
-}
-
-func openPageFile(homeDir, host, project, page string) (*os.File, error) {
-
-	directory := path.Join(homeDir, "page", trimPortFromHost(host), project)
-	filepath := path.Join(directory, EncodeFilename(page))
-	fin, err := os.Open(filepath)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open page cache file")
-	}
-
-	return fin, nil
-}
-
 type Client struct {
-	HomeDir string
-
 	URL        *url.URL
 	HTTPClient *http.Client
 
@@ -162,9 +62,8 @@ type Client struct {
 	Expiration time.Duration
 }
 
-func NewClient(homedir string, url *url.URL, token string, expiration int) (*Client, error) {
+func NewClient(url *url.URL, token string, expiration int) (*Client, error) {
 	return &Client{
-		HomeDir:    homedir,
 		URL:        url,
 		HTTPClient: &http.Client{},
 		Token:      token,
@@ -225,8 +124,8 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 
 	host := (*c.URL).Host
 	expiration := c.Expiration
-	if haveGoodQueryResultFile(c.HomeDir, host, project, tags, skip, limit, expiration) {
-		res, err := openQueryResultFile(c.HomeDir, host, project, tags, skip, limit)
+	if haveGoodQueryResultFile(ScrapboxHomeFromEnv(), host, project, tags, skip, limit, expiration) {
+		res, err := openQueryResultFile(ScrapboxHomeFromEnv(), host, project, tags, skip, limit)
 		if err != nil {
 			return nil, err
 		}
@@ -250,7 +149,7 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 			return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
 		}
 
-		fout, err := createQueryResultFile(c.HomeDir, host, project, tags, skip, limit)
+		fout, err := createQueryResultFile(ScrapboxHomeFromEnv(), host, project, tags, skip, limit)
 		if err != nil {
 			return nil, err
 		}
@@ -308,8 +207,8 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 
 	host := (*c.URL).Host
 	expiration := c.Expiration
-	if haveGoodPageFile(c.HomeDir, host, project, page, expiration) {
-		res, err := openPageFile(c.HomeDir, host, project, page)
+	if haveGoodPageFile(ScrapboxHomeFromEnv(), host, project, page, expiration) {
+		res, err := openPageFile(ScrapboxHomeFromEnv(), host, project, page)
 		if err != nil {
 			return nil, err
 		}
@@ -333,7 +232,7 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 			return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
 		}
 
-		fout, err := createPageFile(c.HomeDir, host, project, page)
+		fout, err := createPageFile(ScrapboxHomeFromEnv(), host, project, page)
 		if err != nil {
 			return nil, err
 		}

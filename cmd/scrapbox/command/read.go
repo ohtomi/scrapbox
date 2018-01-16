@@ -80,7 +80,7 @@ func (c *ReadCommand) Run(args []string) int {
 
 	// process
 
-	client, err := client.NewClient(ScrapboxHomeFromEnv(), parsedURL, token, expiration)
+	client, err := client.NewClient(parsedURL, token, expiration)
 	if err != nil {
 		c.Ui.Error(fmt.Sprintf("failed to initialize api client. cause: %s", err))
 		return int(ExitCodeError)
