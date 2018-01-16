@@ -60,8 +60,8 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 			return nil, err
 		}
 	} else {
-		spath := buildQueryPath(project, tags, skip, limit)
-		req, err := c.newRequest(ctx, "GET", spath, nil)
+		queryPath := buildQueryPath(project, tags, skip, limit)
+		req, err := c.newRequest(ctx, "GET", queryPath, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -75,12 +75,12 @@ func (c *Client) ExecQuery(ctx context.Context, project string, tags []string, s
 			return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
 		}
 
-		fout, err := createQueryResultFile(host, project, tags, skip, limit)
+		resp, err := createQueryResultFile(host, project, tags, skip, limit)
 		if err != nil {
 			return nil, err
 		}
 
-		if err := c.decodeBody(res, &v, fout); err != nil {
+		if err := c.decodeBody(res, &v, resp); err != nil {
 			return nil, err
 		}
 	}
@@ -136,8 +136,8 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 			return nil, err
 		}
 	} else {
-		spath := buildPagePath(project, page)
-		req, err := c.newRequest(ctx, "GET", spath, nil)
+		pagePath := buildPagePath(project, page)
+		req, err := c.newRequest(ctx, "GET", pagePath, nil)
 		if err != nil {
 			return nil, err
 		}
@@ -151,12 +151,12 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 			return nil, errors.New(fmt.Sprintf("http status is %q", res.Status))
 		}
 
-		fout, err := createPageFile(host, project, page)
+		resp, err := createPageFile(host, project, page)
 		if err != nil {
 			return nil, err
 		}
 
-		if err := c.decodeBody(res, &v, fout); err != nil {
+		if err := c.decodeBody(res, &v, resp); err != nil {
 			return nil, err
 		}
 	}
@@ -178,10 +178,10 @@ func (c *Client) GetPage(ctx context.Context, project, page string) (*Page, erro
 	}, nil
 }
 
-func (c *Client) newRequest(ctx context.Context, method, spath string, body io.Reader) (*http.Request, error) {
+func (c *Client) newRequest(ctx context.Context, method, path string, body io.Reader) (*http.Request, error) {
 
 	baseURL := *c.URL
-	u := fmt.Sprintf("%s/%s", baseURL.String(), spath)
+	u := fmt.Sprintf("%s/%s", baseURL.String(), path)
 
 	req, err := http.NewRequest(method, u, body)
 	if err != nil {

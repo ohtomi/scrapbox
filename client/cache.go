@@ -17,31 +17,31 @@ const (
 
 func createQueryResultFile(host, project string, tags []string, skip, limit int) (*os.File, error) {
 
-	directory := path.Join(getScrapboxHomeDir(), "query", trimPortFromHost(host), project, path.Join(tags...))
-	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
+	baseDir := path.Join(getScrapboxHomeDir(), "query", trimPortFromHost(host), project, path.Join(tags...))
+	if err := os.MkdirAll(baseDir, os.ModePerm); err != nil {
 		return nil, errors.Wrap(err, "failed to make query cache directory")
 	}
-	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
-	fout, err := os.Create(filepath)
+	queryResultFilePath := path.Join(baseDir, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
+	queryResultFile, err := os.Create(queryResultFilePath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create query cache file")
 	}
 
-	return fout, nil
+	return queryResultFile, nil
 }
 
 func haveGoodQueryResultFile(host, project string, tags []string, skip, limit int, expiration time.Duration) bool {
 
-	directory := path.Join(getScrapboxHomeDir(), "query", trimPortFromHost(host), project, path.Join(tags...))
-	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
-	finfo, err := os.Stat(filepath)
+	baseDir := path.Join(getScrapboxHomeDir(), "query", trimPortFromHost(host), project, path.Join(tags...))
+	queryResultFilePath := path.Join(baseDir, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
+	fs, err := os.Stat(queryResultFilePath)
 	if err != nil {
 		return false
 	}
-	if finfo.IsDir() {
+	if fs.IsDir() {
 		return false
 	}
-	mod := finfo.ModTime()
+	mod := fs.ModTime()
 	now := time.Now()
 	duration := now.Sub(mod)
 
@@ -50,43 +50,43 @@ func haveGoodQueryResultFile(host, project string, tags []string, skip, limit in
 
 func openQueryResultFile(host, project string, tags []string, skip, limit int) (*os.File, error) {
 
-	directory := path.Join(getScrapboxHomeDir(), "query", trimPortFromHost(host), project, path.Join(tags...))
-	filepath := path.Join(directory, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
-	fin, err := os.Open(filepath)
+	baseDir := path.Join(getScrapboxHomeDir(), "query", trimPortFromHost(host), project, path.Join(tags...))
+	queryResultFilePath := path.Join(baseDir, EncodeFilename(fmt.Sprintf("%d-%d", skip, limit)))
+	queryResultFile, err := os.Open(queryResultFilePath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open query cache file")
 	}
 
-	return fin, nil
+	return queryResultFile, nil
 }
 
 func createPageFile(host, project, page string) (*os.File, error) {
 
-	directory := path.Join(getScrapboxHomeDir(), "page", trimPortFromHost(host), project)
-	if err := os.MkdirAll(directory, os.ModePerm); err != nil {
+	baseDir := path.Join(getScrapboxHomeDir(), "page", trimPortFromHost(host), project)
+	if err := os.MkdirAll(baseDir, os.ModePerm); err != nil {
 		return nil, errors.Wrap(err, "failed to make page cache directory")
 	}
-	filepath := path.Join(directory, EncodeFilename(page))
-	fout, err := os.Create(filepath)
+	pageFilePath := path.Join(baseDir, EncodeFilename(page))
+	pageFile, err := os.Create(pageFilePath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create page cache file")
 	}
 
-	return fout, nil
+	return pageFile, nil
 }
 
 func haveGoodPageFile(host, project, page string, expiration time.Duration) bool {
 
-	directory := path.Join(getScrapboxHomeDir(), "page", trimPortFromHost(host), project)
-	filepath := path.Join(directory, EncodeFilename(page))
-	finfo, err := os.Stat(filepath)
+	baseDir := path.Join(getScrapboxHomeDir(), "page", trimPortFromHost(host), project)
+	pageFilePath := path.Join(baseDir, EncodeFilename(page))
+	fs, err := os.Stat(pageFilePath)
 	if err != nil {
 		return false
 	}
-	if finfo.IsDir() {
+	if fs.IsDir() {
 		return false
 	}
-	mod := finfo.ModTime()
+	mod := fs.ModTime()
 	now := time.Now()
 	duration := now.Sub(mod)
 
@@ -95,14 +95,14 @@ func haveGoodPageFile(host, project, page string, expiration time.Duration) bool
 
 func openPageFile(host, project, page string) (*os.File, error) {
 
-	directory := path.Join(getScrapboxHomeDir(), "page", trimPortFromHost(host), project)
-	filepath := path.Join(directory, EncodeFilename(page))
-	fin, err := os.Open(filepath)
+	baseDir := path.Join(getScrapboxHomeDir(), "page", trimPortFromHost(host), project)
+	pageFilePath := path.Join(baseDir, EncodeFilename(page))
+	pageFile, err := os.Open(pageFilePath)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to open page cache file")
 	}
 
-	return fin, nil
+	return pageFile, nil
 }
 
 func getScrapboxHomeDir() string {
