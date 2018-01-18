@@ -131,7 +131,7 @@ $ scrapbox <sub command> --expire <expiration> <arguments>
 To install, use `go get`:
 
 ```console
-$ go get github.com/ohtomi/scrapbox
+$ go get github.com/ohtomi/scrapbox/cmd/scrapbox
 ```
 
 Or get binary from [release page](../../releases/latest).
