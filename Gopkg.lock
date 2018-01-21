@@ -63,6 +63,12 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/prataprc/goparsec"
+  packages = ["."]
+  revision = "6a435303621d72c40579efa4118811f158959e81"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix"]
   revision = "1e2299c37cc91a509f1b12369872d27be0ce98a6"
@@ -70,6 +76,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c09b94112977dddbcb3a51f0f68c37cc5749aab67c3ac133c12773efe69257a1"
+  inputs-digest = "7d481d1805a8cdee1920a86e786c3f588df1c117223a991bd7c56642c7aff0c9"
   solver-name = "gps-cdcl"
   solver-version = 1
