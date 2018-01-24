@@ -7,15 +7,13 @@ import (
 var (
 	ast = parsec.NewAST("ast", 1000)
 
-	w = parsec.Token("[ \t]", "w")
-	c = parsec.Token("[^ \t]", "c")
-	e = ast.End("e")
+	indent = parsec.Token("[ \t]+", "indent")
 
-	indent = ast.Many("indent", nil, w)
+	quoted = parsec.Token(">.+", "quoted")
 
-	image = parsec.Token("(https://gyazo.com/[^ \t]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
-	url   = parsec.Token("https?://[^ \t]+", "url")
-	text  = ast.ManyUntil("text", nil, ast.Many("t", nil, c), w, e)
+	image  = parsec.Token("(https://gyazo.com/[^ \t]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
+	url    = parsec.Token("https?://[^ \t]+", "url")
+	text   = parsec.Token(".+", "text")
 
 	// [text+]
 	// [url]
@@ -32,14 +30,13 @@ var (
 	// [$ text]
 	// #text
 	// #[text+]
-	// ^>text+
 	// `text+`
 	// code:text
 	// table:text
 
 	Y = ast.And("Y", nil,
 		ast.Maybe("maybe", nil, indent),
-		ast.Maybe("maybe", nil, ast.OrdChoice("or", nil, image, url, text)),
+		ast.Maybe("maybe", nil, ast.OrdChoice("or", nil, quoted, image, url, text)),
 	)
 )
 
