@@ -43,7 +43,7 @@ func TestParse__quoted_node(t *testing.T) {
 	}{
 		{
 			">https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
-			[]string{">https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+			[]string{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
 		},
 	} {
 		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
@@ -60,7 +60,13 @@ func TestParse__quoted_node(t *testing.T) {
 
 		for i, expected := range fixture.expected {
 			assertEqualTo(t, queryable.GetChildren()[i+1].GetName(), "quoted")
-			assertEqualTo(t, queryable.GetChildren()[i+1].GetValue(), expected)
+			if len(queryable.GetChildren()[i+1].GetChildren()) != 2 {
+				t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()[i+1].GetChildren()), 2, queryable.GetChildren()[i+1])
+			}
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[0].GetName(), "q")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[0].GetValue(), ">")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[1].GetName(), "t")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[1].GetValue(), expected)
 		}
 	}
 }
