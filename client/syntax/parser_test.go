@@ -11,71 +11,107 @@ var (
 )
 
 func TestParse__indent_node(t *testing.T) {
-	queryable, remaining := Parse([]byte("   "), enablePrettyPrint)
+	for _, fixture := range []struct {
+		original string
+		expected []string
+	}{
+		{"   ", []string{"   "}},
+	} {
+		queryable, remaining := Parse([]byte("   "), enablePrettyPrint)
 
-	if len(remaining) != 0 {
-		t.Fatalf("Got %q, but Want %q", string(remaining), "")
-	}
-	if queryable == nil {
-		t.Fatalf("Failed to parse")
-	}
-	if len(queryable.GetChildren()) == 0 {
-		t.Fatalf("Not found children: %+v", queryable)
-	}
+		if len(remaining) != 0 {
+			t.Fatalf("Got %q, but Want %q", string(remaining), "")
+		}
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+		if len(queryable.GetChildren()) != len(fixture.expected)+1 {
+			t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()), len(fixture.expected)+1, queryable)
+		}
 
-	assertEqualTo(t, queryable.GetChildren()[0].GetName(), "indent")
-	assertEqualTo(t, queryable.GetChildren()[0].GetValue(), "   ")
+		for i, expected := range fixture.expected {
+			assertEqualTo(t, queryable.GetChildren()[i].GetName(), "indent")
+			assertEqualTo(t, queryable.GetChildren()[i].GetValue(), expected)
+		}
+	}
 }
 
 func TestParse__image_node(t *testing.T) {
-	queryable, remaining := Parse([]byte("https://avatars1.githubusercontent.com/u/1678258#.png"), enablePrettyPrint)
+	for _, fixture := range []struct {
+		original string
+		expected []string
+	}{
+		{"https://avatars1.githubusercontent.com/u/1678258#.png", []string{"https://avatars1.githubusercontent.com/u/1678258#.png"}},
+	} {
+		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
 
-	if len(remaining) != 0 {
-		t.Fatalf("Got %q, but Want %q", string(remaining), "")
-	}
-	if queryable == nil {
-		t.Fatalf("Failed to parse")
-	}
-	if len(queryable.GetChildren()) == 0 {
-		t.Fatalf("Not found children: %+v", queryable)
-	}
+		if len(remaining) != 0 {
+			t.Fatalf("Got %q, but Want %q", string(remaining), "")
+		}
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+		if len(queryable.GetChildren()) != len(fixture.expected)+1 {
+			t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()), len(fixture.expected)+1, queryable)
+		}
 
-	assertEqualTo(t, queryable.GetChildren()[1].GetName(), "image")
-	assertEqualTo(t, queryable.GetChildren()[1].GetValue(), "https://avatars1.githubusercontent.com/u/1678258#.png")
+		for i, expected := range fixture.expected {
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetName(), "image")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetValue(), expected)
+		}
+	}
 }
 
 func TestParse__url_node(t *testing.T) {
-	queryable, remaining := Parse([]byte("https://avatars1.githubusercontent.com/u/1678258"), enablePrettyPrint)
+	for _, fixture := range []struct {
+		original string
+		expected []string
+	}{
+		{"https://avatars1.githubusercontent.com/u/1678258", []string{"https://avatars1.githubusercontent.com/u/1678258"}},
+	} {
+		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
 
-	if len(remaining) != 0 {
-		t.Fatalf("Got %q, but Want %q", string(remaining), "")
-	}
-	if queryable == nil {
-		t.Fatalf("Failed to parse")
-	}
-	if len(queryable.GetChildren()) == 0 {
-		t.Fatalf("Not found children: %+v", queryable)
-	}
+		if len(remaining) != 0 {
+			t.Fatalf("Got %q, but Want %q", string(remaining), "")
+		}
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+		if len(queryable.GetChildren()) != len(fixture.expected)+1 {
+			t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()), len(fixture.expected)+1, queryable)
+		}
 
-	assertEqualTo(t, queryable.GetChildren()[1].GetName(), "url")
-	assertEqualTo(t, queryable.GetChildren()[1].GetValue(), "https://avatars1.githubusercontent.com/u/1678258")
+		for i, expected := range fixture.expected {
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetName(), "url")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetValue(), expected)
+		}
+	}
 }
 
 func TestParse__text_node(t *testing.T) {
-	queryable, remaining := Parse([]byte("github.com/ohtomi/scrapbox"), enablePrettyPrint)
+	for _, fixture := range []struct {
+		original string
+		expected []string
+	}{
+		{"github.com/ohtomi/scrapbox", []string{"github.com/ohtomi/scrapbox"}},
+	} {
+		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
 
-	if len(remaining) != 0 {
-		t.Fatalf("Got %q, but Want %q", string(remaining), "")
-	}
-	if queryable == nil {
-		t.Fatalf("Failed to parse")
-	}
-	if len(queryable.GetChildren()) == 0 {
-		t.Fatalf("Not found children: %+v", queryable)
-	}
+		if len(remaining) != 0 {
+			t.Fatalf("Got %q, but Want %q", string(remaining), fixture.original)
+		}
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+		if len(queryable.GetChildren()) != len(fixture.expected)+1 {
+			t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()), len(fixture.expected)+1, queryable)
+		}
 
-	assertEqualTo(t, queryable.GetChildren()[1].GetName(), "text")
-	assertEqualTo(t, queryable.GetChildren()[1].GetValue(), "github.com/ohtomi/scrapbox")
+		for i, expected := range fixture.expected {
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetName(), "text")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetValue(), expected)
+		}
+	}
 }
 
 func assertEqualTo(t *testing.T, actual, expected interface{}) {
