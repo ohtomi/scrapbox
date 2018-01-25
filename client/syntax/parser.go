@@ -9,7 +9,7 @@ var (
 
 	indent = parsec.Token("[ \t]+", "indent")
 
-	quoted = ast.And("quoted", nil, parsec.Token(">", "q"), parsec.Token(".+", "t"))
+	quoted = ast.And("quoted", nil, parsec.Atom(">", "q"), parsec.Token(".+", "t"))
 
 	image  = parsec.Token("(https://gyazo.com/[^ \t]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
 	url    = parsec.Token("https?://[^ \t]+", "url")
