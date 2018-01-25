@@ -11,9 +11,9 @@ var (
 
 	quoted = ast.And("quoted", nil, parsec.Atom(">", "q"), parsec.Token(".+", "t"))
 
-	image  = parsec.Token("(https://gyazo.com/[^ \t]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
-	url    = parsec.Token("https?://[^ \t]+", "url")
-	text   = parsec.Token(".+", "text")
+	image = parsec.Token("(https://gyazo.com/[^ \t]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
+	url   = parsec.Token("https?://[^ \t]+", "url")
+	text  = parsec.Token(".+", "text")
 
 	// [text+]
 	// [url]
