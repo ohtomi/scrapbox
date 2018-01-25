@@ -80,6 +80,74 @@ func TestParse__quoted_node(t *testing.T) {
 	}
 }
 
+func TestParse__code_directive_node(t *testing.T) {
+	for _, fixture := range []struct {
+		original string
+		expected []string
+	}{
+		{"code:sample.js", []string{"sample.js"}},
+		{"   code:sample.js", []string{"sample.js"}},
+		{"\t\t\tcode:sample.js", []string{"sample.js"}},
+	} {
+		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+
+		if len(remaining) != 0 {
+			t.Fatalf("Got %q, but Want %q", string(remaining), "")
+		}
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+		if len(queryable.GetChildren()) != len(fixture.expected)+1 {
+			t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()), len(fixture.expected)+1, queryable)
+		}
+
+		for i, expected := range fixture.expected {
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetName(), "code")
+			if len(queryable.GetChildren()[i+1].GetChildren()) != 2 {
+				t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()[i+1].GetChildren()), 2, queryable.GetChildren()[i+1])
+			}
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[0].GetName(), "c")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[0].GetValue(), "code:")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[1].GetName(), "n")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[1].GetValue(), expected)
+		}
+	}
+}
+
+func TestParse__table_directive_node(t *testing.T) {
+	for _, fixture := range []struct {
+		original string
+		expected []string
+	}{
+		{"table:sample.js", []string{"sample.js"}},
+		{"   table:sample.js", []string{"sample.js"}},
+		{"\t\t\ttable:sample.js", []string{"sample.js"}},
+	} {
+		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+
+		if len(remaining) != 0 {
+			t.Fatalf("Got %q, but Want %q", string(remaining), "")
+		}
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+		if len(queryable.GetChildren()) != len(fixture.expected)+1 {
+			t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()), len(fixture.expected)+1, queryable)
+		}
+
+		for i, expected := range fixture.expected {
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetName(), "table")
+			if len(queryable.GetChildren()[i+1].GetChildren()) != 2 {
+				t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()[i+1].GetChildren()), 2, queryable.GetChildren()[i+1])
+			}
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[0].GetName(), "t")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[0].GetValue(), "table:")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[1].GetName(), "n")
+			assertEqualTo(t, queryable.GetChildren()[i+1].GetChildren()[1].GetValue(), expected)
+		}
+	}
+}
+
 func TestParse__image_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
