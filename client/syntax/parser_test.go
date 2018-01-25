@@ -16,8 +16,9 @@ func TestParse__indent_node(t *testing.T) {
 		expected []string
 	}{
 		{"   ", []string{"   "}},
+		{"\t\t\t", []string{"\t\t\t"}},
 	} {
-		queryable, remaining := Parse([]byte("   "), enablePrettyPrint)
+		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
 
 		if len(remaining) != 0 {
 			t.Fatalf("Got %q, but Want %q", string(remaining), "")
@@ -43,6 +44,14 @@ func TestParse__quoted_node(t *testing.T) {
 	}{
 		{
 			">https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
+			[]string{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+		},
+		{
+			"   >https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
+			[]string{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+		},
+		{
+			"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
 			[]string{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
 		},
 	} {
@@ -77,6 +86,8 @@ func TestParse__image_node(t *testing.T) {
 		expected []string
 	}{
 		{"https://avatars1.githubusercontent.com/u/1678258#.png", []string{"https://avatars1.githubusercontent.com/u/1678258#.png"}},
+		{"   https://avatars1.githubusercontent.com/u/1678258#.png", []string{"https://avatars1.githubusercontent.com/u/1678258#.png"}},
+		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.png", []string{"https://avatars1.githubusercontent.com/u/1678258#.png"}},
 	} {
 		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -103,6 +114,8 @@ func TestParse__url_node(t *testing.T) {
 		expected []string
 	}{
 		{"https://avatars1.githubusercontent.com/u/1678258", []string{"https://avatars1.githubusercontent.com/u/1678258"}},
+		{"   https://avatars1.githubusercontent.com/u/1678258", []string{"https://avatars1.githubusercontent.com/u/1678258"}},
+		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258", []string{"https://avatars1.githubusercontent.com/u/1678258"}},
 	} {
 		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -129,6 +142,8 @@ func TestParse__text_node(t *testing.T) {
 		expected []string
 	}{
 		{"github.com/ohtomi/scrapbox", []string{"github.com/ohtomi/scrapbox"}},
+		{"   github.com/ohtomi/scrapbox", []string{"github.com/ohtomi/scrapbox"}},
+		{"\t\t\tgithub.com/ohtomi/scrapbox", []string{"github.com/ohtomi/scrapbox"}},
 	} {
 		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
 
