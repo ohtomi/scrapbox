@@ -39,17 +39,17 @@ func NewAST() AST {
 	// #[text+]
 	// `text+`
 
-	Y := ast.And("Y", nil,
+	root := ast.And("root", nil,
 		ast.Maybe("maybe", nil, indent),
 		ast.Maybe("maybe", nil, ast.OrdChoice("or", nil, quoted, code, table, image, url, text)),
 	)
 
-	return AST{ast: ast, parser: Y}
+	return AST{ast: ast, parser: root}
 }
 
-func Parse(line []byte, debug bool) parsec.Queryable {
+func Parse(contents []byte, debug bool) parsec.Queryable {
 	ast := NewAST()
-	scanner := parsec.NewScanner(line).SetWSPattern("^[\r\n]+")
+	scanner := parsec.NewScanner(contents).SetWSPattern("^[\r\n]+")
 	queryable, _ := ast.ast.Parsewith(ast.parser, scanner)
 
 	if debug {
