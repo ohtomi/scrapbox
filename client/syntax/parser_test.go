@@ -18,11 +18,8 @@ func TestParse__indent_node(t *testing.T) {
 		{"   ", []string{"   "}},
 		{"\t\t\t", []string{"\t\t\t"}},
 	} {
-		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
-		if len(remaining) != 0 {
-			t.Fatalf("Got %q, but Want %q", string(remaining), "")
-		}
 		if queryable == nil {
 			t.Fatalf("Failed to parse")
 		}
@@ -55,11 +52,8 @@ func TestParse__quoted_node(t *testing.T) {
 			[]string{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
 		},
 	} {
-		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
-		if len(remaining) != 0 {
-			t.Fatalf("Got %q, but Want %q", string(remaining), fixture.original)
-		}
 		if queryable == nil {
 			t.Fatalf("Failed to parse")
 		}
@@ -89,11 +83,8 @@ func TestParse__code_directive_node(t *testing.T) {
 		{"   code:sample.js", []string{"sample.js"}},
 		{"\t\t\tcode:sample.js", []string{"sample.js"}},
 	} {
-		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
-		if len(remaining) != 0 {
-			t.Fatalf("Got %q, but Want %q", string(remaining), "")
-		}
 		if queryable == nil {
 			t.Fatalf("Failed to parse")
 		}
@@ -123,11 +114,8 @@ func TestParse__table_directive_node(t *testing.T) {
 		{"   table:sample.js", []string{"sample.js"}},
 		{"\t\t\ttable:sample.js", []string{"sample.js"}},
 	} {
-		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
-		if len(remaining) != 0 {
-			t.Fatalf("Got %q, but Want %q", string(remaining), "")
-		}
 		if queryable == nil {
 			t.Fatalf("Failed to parse")
 		}
@@ -157,11 +145,8 @@ func TestParse__image_node(t *testing.T) {
 		{"   https://avatars1.githubusercontent.com/u/1678258#.png", []string{"https://avatars1.githubusercontent.com/u/1678258#.png"}},
 		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.png", []string{"https://avatars1.githubusercontent.com/u/1678258#.png"}},
 	} {
-		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
-		if len(remaining) != 0 {
-			t.Fatalf("Got %q, but Want %q", string(remaining), "")
-		}
 		if queryable == nil {
 			t.Fatalf("Failed to parse")
 		}
@@ -185,11 +170,8 @@ func TestParse__url_node(t *testing.T) {
 		{"   https://avatars1.githubusercontent.com/u/1678258", []string{"https://avatars1.githubusercontent.com/u/1678258"}},
 		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258", []string{"https://avatars1.githubusercontent.com/u/1678258"}},
 	} {
-		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
-		if len(remaining) != 0 {
-			t.Fatalf("Got %q, but Want %q", string(remaining), "")
-		}
 		if queryable == nil {
 			t.Fatalf("Failed to parse")
 		}
@@ -213,11 +195,8 @@ func TestParse__text_node(t *testing.T) {
 		{"   github.com/ohtomi/scrapbox", []string{"github.com/ohtomi/scrapbox"}},
 		{"\t\t\tgithub.com/ohtomi/scrapbox", []string{"github.com/ohtomi/scrapbox"}},
 	} {
-		queryable, remaining := Parse([]byte(fixture.original), enablePrettyPrint)
+		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
-		if len(remaining) != 0 {
-			t.Fatalf("Got %q, but Want %q", string(remaining), fixture.original)
-		}
 		if queryable == nil {
 			t.Fatalf("Failed to parse")
 		}

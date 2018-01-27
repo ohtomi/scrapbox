@@ -40,14 +40,13 @@ var (
 	)
 )
 
-func Parse(line []byte, debug bool) (parsec.Queryable, []byte) {
+func Parse(line []byte, debug bool) parsec.Queryable {
 	ast.Reset()
 	scanner := parsec.NewScanner(line).SetWSPattern("^[\r\n]+")
-	queryable, scanner := ast.Parsewith(Y, scanner)
-	remaining, _ := scanner.Match(".+")
+	queryable, _ := ast.Parsewith(Y, scanner)
 
 	if debug {
 		ast.Prettyprint()
 	}
-	return queryable, remaining
+	return queryable
 }
