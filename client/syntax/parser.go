@@ -20,7 +20,7 @@ func NewAST() AST {
 
 	image := parsec.Token("(https://gyazo.com/[^ \t]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
 	url := parsec.Token("https?://[^ \t]+", "url")
-	text := parsec.Token(".+", "text")
+	text := parsec.Token(".*", "text")
 
 	// [text+]
 	// [url]
@@ -39,7 +39,29 @@ func NewAST() AST {
 	// #[text+]
 	// `text+`
 
-	root := ast.And("root", nil,
+	callback := func(name string, s parsec.Scanner, node parsec.Queryable) parsec.Queryable {
+		children := node.GetChildren()
+		body := children[1]
+
+		switch body.GetName() {
+		case "quoted":
+			return NewQuotedText(node)
+		case "code":
+			return NewCodeBlock(node)
+		case "table":
+			return NewTableBlock(node)
+		case "image":
+			return NewSimpleText(node)
+		case "url":
+			return NewSimpleText(node)
+		case "text":
+			return NewSimpleText(node)
+		default:
+			return NewSimpleText(node)
+		}
+	}
+
+	root := ast.And("root", callback,
 		ast.Maybe("maybe", nil, indent),
 		ast.Maybe("maybe", nil, ast.OrdChoice("or", nil, quoted, code, table, image, url, text)),
 	)
