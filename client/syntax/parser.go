@@ -55,9 +55,12 @@ func NewAST() AST {
 		}
 	}
 
-	root := ast.And("root", callback,
-		ast.Maybe("maybe", nil, indent),
-		ast.Maybe("maybe", nil, ast.OrdChoice("or", nil, quoted, code, table, image, url, text)),
+	root := ast.Kleene("kleene", nil,
+		ast.And("and", callback,
+			ast.Maybe("maybe", nil, indent),
+			ast.Maybe("maybe", nil, ast.OrdChoice("or", nil, quoted, code, table, image, url, text)),
+		),
+		parsec.Token("[\r\n]+", "sep"),
 	)
 
 	return AST{ast: ast, parser: root}
