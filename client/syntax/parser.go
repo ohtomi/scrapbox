@@ -50,12 +50,6 @@ func NewAST() AST {
 			return NewCodeBlock(node)
 		case "table":
 			return NewTableBlock(node)
-		case "image":
-			return NewSimpleText(node)
-		case "url":
-			return NewSimpleText(node)
-		case "text":
-			return NewSimpleText(node)
 		default:
 			return NewSimpleText(node)
 		}
