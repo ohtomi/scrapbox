@@ -14,10 +14,10 @@ var (
 func TestParse__indent_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
-		indent   int
+		indent   []int
 	}{
-		{"   ", 3},
-		{"\t\t\t", 3},
+		{"   ", []int{3}},
+		{"\t\t\t", []int{3}},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -25,9 +25,9 @@ func TestParse__indent_node(t *testing.T) {
 			t.Fatalf("Failed to parse")
 		}
 
-		for _, node := range queryable.GetChildren() {
+		for i, node := range queryable.GetChildren() {
 			assertEqualTo(t, node.GetName(), "simple_text")
-			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent)})
+			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 		}
 	}
 }
@@ -35,26 +35,26 @@ func TestParse__indent_node(t *testing.T) {
 func TestParse__quoted_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
-		indent   int
+		indent   []int
 		expected [][]string
 	}{
 		{
 			">https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
-			0,
+			[]int{0},
 			[][]string{
 				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
 			},
 		},
 		{
 			"   >https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
-			3,
+			[]int{3},
 			[][]string{
 				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
 			},
 		},
 		{
 			"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
-			3,
+			[]int{3},
 			[][]string{
 				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
 			},
@@ -71,7 +71,7 @@ func TestParse__quoted_node(t *testing.T) {
 
 		for i, node := range queryable.GetChildren() {
 			assertEqualTo(t, node.GetName(), "quoted_text")
-			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent)})
+			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
 				assertEqualTo(t, node.GetChildren()[j].GetName(), "quoted")
@@ -90,12 +90,12 @@ func TestParse__quoted_node(t *testing.T) {
 func TestParse__code_directive_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
-		indent   int
+		indent   []int
 		expected [][]string
 	}{
-		{"code:sample.js", 0, [][]string{{"sample.js"}}},
-		{"   code:sample.js", 3, [][]string{{"sample.js"}}},
-		{"\t\t\tcode:sample.js", 3, [][]string{{"sample.js"}}},
+		{"code:sample.js", []int{0}, [][]string{{"sample.js"}}},
+		{"   code:sample.js", []int{3}, [][]string{{"sample.js"}}},
+		{"\t\t\tcode:sample.js", []int{3}, [][]string{{"sample.js"}}},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -108,7 +108,7 @@ func TestParse__code_directive_node(t *testing.T) {
 
 		for i, node := range queryable.GetChildren() {
 			assertEqualTo(t, node.GetName(), "code_block")
-			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent)})
+			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
 				assertEqualTo(t, node.GetChildren()[j].GetName(), "code")
@@ -127,12 +127,12 @@ func TestParse__code_directive_node(t *testing.T) {
 func TestParse__table_directive_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
-		indent   int
+		indent   []int
 		expected [][]string
 	}{
-		{"table:sample.js", 0, [][]string{{"sample.js"}}},
-		{"   table:sample.js", 3, [][]string{{"sample.js"}}},
-		{"\t\t\ttable:sample.js", 3, [][]string{{"sample.js"}}},
+		{"table:sample.js", []int{0}, [][]string{{"sample.js"}}},
+		{"   table:sample.js", []int{3}, [][]string{{"sample.js"}}},
+		{"\t\t\ttable:sample.js", []int{3}, [][]string{{"sample.js"}}},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -145,7 +145,7 @@ func TestParse__table_directive_node(t *testing.T) {
 
 		for i, node := range queryable.GetChildren() {
 			assertEqualTo(t, node.GetName(), "table_block")
-			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent)})
+			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
 				assertEqualTo(t, node.GetChildren()[j].GetName(), "table")
@@ -164,12 +164,12 @@ func TestParse__table_directive_node(t *testing.T) {
 func TestParse__image_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
-		indent   int
+		indent   []int
 		expected [][]string
 	}{
-		{"https://avatars1.githubusercontent.com/u/1678258#.png", 0, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
-		{"   https://avatars1.githubusercontent.com/u/1678258#.png", 3, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
-		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.png", 3, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
+		{"https://avatars1.githubusercontent.com/u/1678258#.png", []int{0}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
+		{"   https://avatars1.githubusercontent.com/u/1678258#.png", []int{3}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
+		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.png", []int{3}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -182,7 +182,7 @@ func TestParse__image_node(t *testing.T) {
 
 		for i, node := range queryable.GetChildren() {
 			assertEqualTo(t, node.GetName(), "simple_text")
-			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent)})
+			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
 				assertEqualTo(t, node.GetChildren()[j].GetName(), "image")
@@ -195,12 +195,12 @@ func TestParse__image_node(t *testing.T) {
 func TestParse__url_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
-		indent   int
+		indent   []int
 		expected [][]string
 	}{
-		{"https://avatars1.githubusercontent.com/u/1678258", 0, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
-		{"   https://avatars1.githubusercontent.com/u/1678258", 3, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
-		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258", 3, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
+		{"https://avatars1.githubusercontent.com/u/1678258", []int{0}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
+		{"   https://avatars1.githubusercontent.com/u/1678258", []int{3}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
+		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258", []int{3}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -213,7 +213,7 @@ func TestParse__url_node(t *testing.T) {
 
 		for i, node := range queryable.GetChildren() {
 			assertEqualTo(t, node.GetName(), "simple_text")
-			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent)})
+			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
 				assertEqualTo(t, node.GetChildren()[j].GetName(), "url")
@@ -226,12 +226,12 @@ func TestParse__url_node(t *testing.T) {
 func TestParse__text_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
-		indent   int
+		indent   []int
 		expected [][]string
 	}{
-		{"github.com/ohtomi/scrapbox", 0, [][]string{{"github.com/ohtomi/scrapbox"}}},
-		{"   github.com/ohtomi/scrapbox", 3, [][]string{{"github.com/ohtomi/scrapbox"}}},
-		{"\t\t\tgithub.com/ohtomi/scrapbox", 3, [][]string{{"github.com/ohtomi/scrapbox"}}},
+		{"github.com/ohtomi/scrapbox", []int{0}, [][]string{{"github.com/ohtomi/scrapbox"}}},
+		{"   github.com/ohtomi/scrapbox", []int{3}, [][]string{{"github.com/ohtomi/scrapbox"}}},
+		{"\t\t\tgithub.com/ohtomi/scrapbox", []int{3}, [][]string{{"github.com/ohtomi/scrapbox"}}},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -244,7 +244,7 @@ func TestParse__text_node(t *testing.T) {
 
 		for i, node := range queryable.GetChildren() {
 			assertEqualTo(t, node.GetName(), "simple_text")
-			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent)})
+			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
 				assertEqualTo(t, node.GetChildren()[j].GetName(), "text")
