@@ -11,15 +11,14 @@ type CodeBlock struct {
 }
 
 func NewCodeBlock(node parsec.Queryable) *CodeBlock {
-	children := node.GetChildren()
+	children := node.GetChildren()[1:]
 	attributes := map[string][]string{}
 
-	for i, child := range children {
+	if len(node.GetChildren()) > 0 {
+		child := node.GetChildren()[0]
 		if child.GetName() == "indent" {
-			children = append(children[:i], children[i+1:]...)
 			attributes["indent"] = []string{fmt.Sprintf("%d", len(child.GetValue()))}
 		} else if child.GetName() == "missing" {
-			children = append(children[:i], children[i+1:]...)
 			attributes["indent"] = []string{fmt.Sprintf("%d", 0)}
 		}
 	}
