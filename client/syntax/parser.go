@@ -18,9 +18,9 @@ func NewAST() AST {
 	code := ast.And("code", nil, parsec.Atom("code:", "c"), parsec.Token(".+", "n"))
 	table := ast.And("table", nil, parsec.Atom("table:", "t"), parsec.Token(".+", "n"))
 
-	image := parsec.Token("(https://gyazo.com/[^ \t]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
-	url := parsec.Token("https?://[^ \t]+", "url")
-	text := parsec.Token(".+", "text")
+	image := parsec.Token("(https://gyazo.com/[^ \t\n]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
+	url := parsec.Token("https?://[^ \t\n]+", "url")
+	text := parsec.Token("[^\n]+", "text")
 
 	// [text+]
 	// [url]
@@ -38,6 +38,8 @@ func NewAST() AST {
 	// #text
 	// #[text+]
 	// `text+`
+
+	lf := parsec.Token("\n", "lf")
 
 	callback := func(name string, s parsec.Scanner, node parsec.Queryable) parsec.Queryable {
 		children := node.GetChildren()
@@ -60,7 +62,7 @@ func NewAST() AST {
 			ast.Maybe("maybe", nil, indent),
 			ast.Maybe("maybe", nil, ast.OrdChoice("or", nil, quoted, code, table, image, url, text)),
 		),
-		parsec.Token("[\r\n]+", "sep"),
+		lf,
 	)
 
 	return AST{ast: ast, parser: root}
@@ -68,7 +70,7 @@ func NewAST() AST {
 
 func Parse(contents []byte, debug bool) parsec.Queryable {
 	ast := NewAST()
-	scanner := parsec.NewScanner(contents).SetWSPattern("^[\r\n]+")
+	scanner := parsec.NewScanner(contents).SetWSPattern("\r\n")
 	queryable, _ := ast.ast.Parsewith(ast.parser, scanner)
 
 	if debug {
