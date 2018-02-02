@@ -16,8 +16,16 @@ func TestParse__indent_node(t *testing.T) {
 		original string
 		indent   []int
 	}{
-		{"   ", []int{3}},
-		{"\t\t\t", []int{3}},
+		{"   ",
+			[]int{3},
+		},
+		{"\t\t\t",
+			[]int{3},
+		},
+		{"   \n" +
+			"\t\t\t",
+			[]int{3, 3},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -59,6 +67,17 @@ func TestParse__quoted_node(t *testing.T) {
 				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
 			},
 		},
+		{
+			">https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox\n" +
+				"   >https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox\n" +
+				"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
+			[]int{0, 3, 3},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -93,9 +112,24 @@ func TestParse__code_directive_node(t *testing.T) {
 		indent   []int
 		expected [][]string
 	}{
-		{"code:sample.js", []int{0}, [][]string{{"sample.js"}}},
-		{"   code:sample.js", []int{3}, [][]string{{"sample.js"}}},
-		{"\t\t\tcode:sample.js", []int{3}, [][]string{{"sample.js"}}},
+		{"code:sample.js",
+			[]int{0},
+			[][]string{
+				{"sample.js"},
+			},
+		},
+		{"   code:sample.js",
+			[]int{3},
+			[][]string{
+				{"sample.js"},
+			},
+		},
+		{"\t\t\tcode:sample.js",
+			[]int{3},
+			[][]string{
+				{"sample.js"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -130,9 +164,24 @@ func TestParse__table_directive_node(t *testing.T) {
 		indent   []int
 		expected [][]string
 	}{
-		{"table:sample.js", []int{0}, [][]string{{"sample.js"}}},
-		{"   table:sample.js", []int{3}, [][]string{{"sample.js"}}},
-		{"\t\t\ttable:sample.js", []int{3}, [][]string{{"sample.js"}}},
+		{"table:sample.js",
+			[]int{0},
+			[][]string{
+				{"sample.js"},
+			},
+		},
+		{"   table:sample.js",
+			[]int{3},
+			[][]string{
+				{"sample.js"},
+			},
+		},
+		{"\t\t\ttable:sample.js",
+			[]int{3},
+			[][]string{
+				{"sample.js"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -167,9 +216,34 @@ func TestParse__image_node(t *testing.T) {
 		indent   []int
 		expected [][]string
 	}{
-		{"https://avatars1.githubusercontent.com/u/1678258#.png", []int{0}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
-		{"   https://avatars1.githubusercontent.com/u/1678258#.png", []int{3}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
-		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.png", []int{3}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258#.png"}}},
+		{"https://avatars1.githubusercontent.com/u/1678258#.png",
+			[]int{0},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+			},
+		},
+		{"   https://avatars1.githubusercontent.com/u/1678258#.png",
+			[]int{3},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+			},
+		},
+		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.png",
+			[]int{3},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+			},
+		},
+		{"https://avatars1.githubusercontent.com/u/1678258#.png\n" +
+			"   https://avatars1.githubusercontent.com/u/1678258#.png\n" +
+			"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.png",
+			[]int{0, 3, 3},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -198,9 +272,34 @@ func TestParse__url_node(t *testing.T) {
 		indent   []int
 		expected [][]string
 	}{
-		{"https://avatars1.githubusercontent.com/u/1678258", []int{0}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
-		{"   https://avatars1.githubusercontent.com/u/1678258", []int{3}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
-		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258", []int{3}, [][]string{{"https://avatars1.githubusercontent.com/u/1678258"}}},
+		{"https://avatars1.githubusercontent.com/u/1678258",
+			[]int{0},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258"},
+			},
+		},
+		{"   https://avatars1.githubusercontent.com/u/1678258",
+			[]int{3},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258"},
+			},
+		},
+		{"\t\t\thttps://avatars1.githubusercontent.com/u/1678258",
+			[]int{3},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258"},
+			},
+		},
+		{"https://avatars1.githubusercontent.com/u/1678258\n" +
+			"   https://avatars1.githubusercontent.com/u/1678258\n" +
+			"\t\t\thttps://avatars1.githubusercontent.com/u/1678258",
+			[]int{0, 3, 3},
+			[][]string{
+				{"https://avatars1.githubusercontent.com/u/1678258"},
+				{"https://avatars1.githubusercontent.com/u/1678258"},
+				{"https://avatars1.githubusercontent.com/u/1678258"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -229,9 +328,34 @@ func TestParse__text_node(t *testing.T) {
 		indent   []int
 		expected [][]string
 	}{
-		{"github.com/ohtomi/scrapbox", []int{0}, [][]string{{"github.com/ohtomi/scrapbox"}}},
-		{"   github.com/ohtomi/scrapbox", []int{3}, [][]string{{"github.com/ohtomi/scrapbox"}}},
-		{"\t\t\tgithub.com/ohtomi/scrapbox", []int{3}, [][]string{{"github.com/ohtomi/scrapbox"}}},
+		{"github.com/ohtomi/scrapbox",
+			[]int{0},
+			[][]string{
+				{"github.com/ohtomi/scrapbox"},
+			},
+		},
+		{"   github.com/ohtomi/scrapbox",
+			[]int{3},
+			[][]string{
+				{"github.com/ohtomi/scrapbox"},
+			},
+		},
+		{"\t\t\tgithub.com/ohtomi/scrapbox",
+			[]int{3},
+			[][]string{
+				{"github.com/ohtomi/scrapbox"},
+			},
+		},
+		{"github.com/ohtomi/scrapbox\n" +
+			"   github.com/ohtomi/scrapbox\n" +
+			"\t\t\tgithub.com/ohtomi/scrapbox",
+			[]int{0, 3, 3},
+			[][]string{
+				{"github.com/ohtomi/scrapbox"},
+				{"github.com/ohtomi/scrapbox"},
+				{"github.com/ohtomi/scrapbox"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
