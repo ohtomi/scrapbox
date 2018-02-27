@@ -47,35 +47,35 @@ func TestParse__quoted_node(t *testing.T) {
 		expected [][]string
 	}{
 		{
-			">https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
+			">https://avatars1.githubusercontent.com/u/1678258#.png",
 			[]int{0},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
 			},
 		},
 		{
-			"   >https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
+			"   >https://avatars1.githubusercontent.com/u/1678258#.png",
 			[]int{3},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
 			},
 		},
 		{
-			"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
+			"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.png",
 			[]int{3},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
 			},
 		},
 		{
-			">https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox\n" +
-				"   >https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox\n" +
-				"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox",
+			">https://avatars1.githubusercontent.com/u/1678258#.png\n" +
+				"   >https://avatars1.githubusercontent.com/u/1678258#.jpg\n" +
+				"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.gif",
 			[]int{0, 3, 3},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
-				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
-				{"https://avatars1.githubusercontent.com/u/1678258#.png https://avatars1.githubusercontent.com/u/1678258 github.com/ohtomi/scrapbox"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.jpg"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.gif"},
 			},
 		},
 	} {
@@ -164,22 +164,22 @@ func TestParse__table_directive_node(t *testing.T) {
 		indent   []int
 		expected [][]string
 	}{
-		{"table:sample.js",
+		{"table:sample",
 			[]int{0},
 			[][]string{
-				{"sample.js"},
+				{"sample"},
 			},
 		},
-		{"   table:sample.js",
+		{"   table:sample",
 			[]int{3},
 			[][]string{
-				{"sample.js"},
+				{"sample"},
 			},
 		},
-		{"\t\t\ttable:sample.js",
+		{"\t\t\ttable:sample",
 			[]int{3},
 			[][]string{
-				{"sample.js"},
+				{"sample"},
 			},
 		},
 	} {
@@ -235,13 +235,13 @@ func TestParse__image_node(t *testing.T) {
 			},
 		},
 		{"https://avatars1.githubusercontent.com/u/1678258#.png\n" +
-			"   https://avatars1.githubusercontent.com/u/1678258#.png\n" +
-			"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.png",
+			"   https://avatars1.githubusercontent.com/u/1678258#.jpg\n" +
+			"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#.gif",
 			[]int{0, 3, 3},
 			[][]string{
 				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
-				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
-				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.jpg"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.gif"},
 			},
 		},
 	} {
@@ -290,14 +290,14 @@ func TestParse__url_node(t *testing.T) {
 				{"https://avatars1.githubusercontent.com/u/1678258"},
 			},
 		},
-		{"https://avatars1.githubusercontent.com/u/1678258\n" +
-			"   https://avatars1.githubusercontent.com/u/1678258\n" +
-			"\t\t\thttps://avatars1.githubusercontent.com/u/1678258",
+		{"https://avatars1.githubusercontent.com/u/1678258#1\n" +
+			"   https://avatars1.githubusercontent.com/u/1678258#2\n" +
+			"\t\t\thttps://avatars1.githubusercontent.com/u/1678258#3",
 			[]int{0, 3, 3},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258"},
-				{"https://avatars1.githubusercontent.com/u/1678258"},
-				{"https://avatars1.githubusercontent.com/u/1678258"},
+				{"https://avatars1.githubusercontent.com/u/1678258#1"},
+				{"https://avatars1.githubusercontent.com/u/1678258#2"},
+				{"https://avatars1.githubusercontent.com/u/1678258#3"},
 			},
 		},
 	} {
@@ -346,14 +346,14 @@ func TestParse__text_node(t *testing.T) {
 				{"github.com/ohtomi/scrapbox"},
 			},
 		},
-		{"github.com/ohtomi/scrapbox\n" +
-			"   github.com/ohtomi/scrapbox\n" +
-			"\t\t\tgithub.com/ohtomi/scrapbox",
+		{"github.com/ohtomi/scrapbox/1\n" +
+			"   github.com/ohtomi/scrapbox/2\n" +
+			"\t\t\tgithub.com/ohtomi/scrapbox/3",
 			[]int{0, 3, 3},
 			[][]string{
-				{"github.com/ohtomi/scrapbox"},
-				{"github.com/ohtomi/scrapbox"},
-				{"github.com/ohtomi/scrapbox"},
+				{"github.com/ohtomi/scrapbox/1"},
+				{"github.com/ohtomi/scrapbox/2"},
+				{"github.com/ohtomi/scrapbox/3"},
 			},
 		},
 	} {
