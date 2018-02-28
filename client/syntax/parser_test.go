@@ -47,35 +47,35 @@ func TestParse__quoted_node(t *testing.T) {
 		expected [][]string
 	}{
 		{
-			">https://avatars1.githubusercontent.com/u/1678258#.png",
+			">https://avatars1.githubusercontent.com/u/1678258",
 			[]int{0},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+				{"https://avatars1.githubusercontent.com/u/1678258"},
 			},
 		},
 		{
-			"   >https://avatars1.githubusercontent.com/u/1678258#.png",
+			"   >https://avatars1.githubusercontent.com/u/1678258",
 			[]int{3},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+				{"https://avatars1.githubusercontent.com/u/1678258"},
 			},
 		},
 		{
-			"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.png",
+			"\t\t\t>https://avatars1.githubusercontent.com/u/1678258",
 			[]int{3},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
+				{"https://avatars1.githubusercontent.com/u/1678258"},
 			},
 		},
 		{
-			">https://avatars1.githubusercontent.com/u/1678258#.png\n" +
-				"   >https://avatars1.githubusercontent.com/u/1678258#.jpg\n" +
-				"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#.gif",
+			">https://avatars1.githubusercontent.com/u/1678258#1\n" +
+				"   >https://avatars1.githubusercontent.com/u/1678258#2\n" +
+				"\t\t\t>https://avatars1.githubusercontent.com/u/1678258#3",
 			[]int{0, 3, 3},
 			[][]string{
-				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
-				{"https://avatars1.githubusercontent.com/u/1678258#.jpg"},
-				{"https://avatars1.githubusercontent.com/u/1678258#.gif"},
+				{"https://avatars1.githubusercontent.com/u/1678258#1"},
+				{"https://avatars1.githubusercontent.com/u/1678258#2"},
+				{"https://avatars1.githubusercontent.com/u/1678258#3"},
 			},
 		},
 	} {
@@ -93,14 +93,8 @@ func TestParse__quoted_node(t *testing.T) {
 			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
-				assertEqualTo(t, node.GetChildren()[j].GetName(), "quoted")
-				if len(node.GetChildren()[j].GetChildren()) != 2 {
-					t.Fatalf("Found %d, but Want %d: %+v", len(node.GetChildren()[j].GetChildren()), 2, node.GetChildren()[j])
-				}
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[0].GetName(), "q")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[0].GetValue(), ">")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[1].GetName(), "t")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[1].GetValue(), expected)
+				assertEqualTo(t, node.GetChildren()[j].GetName(), "url")
+				assertEqualTo(t, node.GetChildren()[j].GetValue(), expected)
 			}
 		}
 	}
@@ -145,14 +139,8 @@ func TestParse__code_directive_node(t *testing.T) {
 			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
-				assertEqualTo(t, node.GetChildren()[j].GetName(), "code")
-				if len(node.GetChildren()[j].GetChildren()) != 2 {
-					t.Fatalf("Found %d, but Want %d: %+v", len(node.GetChildren()[j].GetChildren()), 2, node.GetChildren()[j])
-				}
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[0].GetName(), "c")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[0].GetValue(), "code:")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[1].GetName(), "n")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[1].GetValue(), expected)
+				assertEqualTo(t, node.GetChildren()[j].GetName(), "text")
+				assertEqualTo(t, node.GetChildren()[j].GetValue(), expected)
 			}
 		}
 	}
@@ -197,14 +185,8 @@ func TestParse__table_directive_node(t *testing.T) {
 			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
 
 			for j, expected := range fixture.expected[i] {
-				assertEqualTo(t, node.GetChildren()[j].GetName(), "table")
-				if len(node.GetChildren()[j].GetChildren()) != 2 {
-					t.Fatalf("Found %d, but Want %d: %+v", len(node.GetChildren()[j].GetChildren()), 2, node.GetChildren()[j])
-				}
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[0].GetName(), "t")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[0].GetValue(), "table:")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[1].GetName(), "n")
-				assertEqualTo(t, node.GetChildren()[j].GetChildren()[1].GetValue(), expected)
+				assertEqualTo(t, node.GetChildren()[j].GetName(), "text")
+				assertEqualTo(t, node.GetChildren()[j].GetValue(), expected)
 			}
 		}
 	}

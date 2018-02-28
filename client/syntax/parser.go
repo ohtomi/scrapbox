@@ -12,15 +12,26 @@ type AST struct {
 func NewAST() AST {
 	ast := parsec.NewAST("ast", 1000)
 
-	indent := parsec.Token("[ \t]+", "indent")
+	lf := parsec.Token("\n", "lf")
+	end := parsec.End()
 
-	quoted := ast.And("quoted", nil, parsec.Atom(">", "q"), parsec.Token(".+", "t"))
-	code := ast.And("code", nil, parsec.Atom("code:", "c"), parsec.Token(".+", "n"))
-	table := ast.And("table", nil, parsec.Atom("table:", "t"), parsec.Token(".+", "n"))
+	ws := parsec.Token("[ \t]+", "ws")
 
-	image := parsec.Token("(https://gyazo.com/[^ \t\n]+)|https?://[^ \t]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
+	indent := ast.Maybe("indent", nil, ws)
+
+	quoted := parsec.Atom(">", "quoted")
+	code := parsec.Atom("code:", "code")
+	table := parsec.Atom("table:", "table")
+
+	mark := ast.OrdChoice("mark", nil, quoted, code, table)
+	head := ast.Maybe("head", nil, mark)
+
+	image := parsec.Token("(https://gyazo.com/[^ \t\n]+)|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
 	url := parsec.Token("https?://[^ \t\n]+", "url")
 	text := parsec.Token("[^\n]+", "text")
+
+	token := ast.OrdChoice("xx", nil, image, url, text)
+	rest := ast.ManyUntil("rest", nil, token, end)
 
 	// [text+]
 	// [url]
@@ -39,31 +50,26 @@ func NewAST() AST {
 	// #[text+]
 	// `text+`
 
-	lf := parsec.Token("\n", "lf")
-
 	callback := func(name string, s parsec.Scanner, node parsec.Queryable) parsec.Queryable {
-		children := node.GetChildren()
+		tokens := node.GetChildren()[0]
+		children := tokens.GetChildren()
 		body := children[1]
 
 		switch body.GetName() {
 		case "quoted":
-			return NewQuotedText(node)
+			return NewQuotedText(tokens)
 		case "code":
-			return NewCodeBlock(node)
+			return NewCodeBlock(tokens)
 		case "table":
-			return NewTableBlock(node)
+			return NewTableBlock(tokens)
 		default:
-			return NewSimpleText(node)
+			return NewSimpleText(tokens)
 		}
 	}
 
-	root := ast.Kleene("kleene", nil,
-		ast.And("and", callback,
-			ast.Maybe("maybe", nil, indent),
-			ast.Maybe("maybe", nil, ast.OrdChoice("or", nil, quoted, code, table, image, url, text)),
-		),
-		lf,
-	)
+	tokens := ast.And("tokens", nil, indent, head, rest)
+	line := ast.ManyUntil("line", callback, tokens, end)
+	root := ast.ManyUntil("root", nil, line, lf, end)
 
 	return AST{ast: ast, parser: root}
 }
@@ -74,7 +80,9 @@ func Parse(contents []byte, debug bool) parsec.Queryable {
 	queryable, _ := ast.ast.Parsewith(ast.parser, scanner)
 
 	if debug {
-		ast.ast.Prettyprint()
+		if queryable != nil {
+			ast.ast.Prettyprint()
+		}
 	}
 
 	return queryable

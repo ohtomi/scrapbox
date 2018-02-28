@@ -11,15 +11,16 @@ type TableBlock struct {
 }
 
 func NewTableBlock(node parsec.Queryable) *TableBlock {
-	children := node.GetChildren()[1:]
+	indent := node.GetChildren()[0]
 	attributes := map[string][]string{}
-
-	head := node.GetChildren()[0]
-	if head.GetName() == "indent" {
-		attributes["indent"] = []string{fmt.Sprintf("%d", len(head.GetValue()))}
-	} else if head.GetName() == "missing" {
+	if indent.GetName() == "ws" {
+		attributes["indent"] = []string{fmt.Sprintf("%d", len(indent.GetValue()))}
+	} else if indent.GetName() == "missing" {
 		attributes["indent"] = []string{fmt.Sprintf("%d", 0)}
 	}
+
+	rest := node.GetChildren()[2]
+	children := rest.GetChildren()
 
 	return &TableBlock{parsec.NonTerminal{Name: "table_block", Children: children, Attributes: attributes}}
 }
