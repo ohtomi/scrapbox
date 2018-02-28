@@ -30,7 +30,7 @@ func NewAST() AST {
 	url := parsec.Token("https?://[^ \t\n]+", "url")
 	text := parsec.Token("[^\n]+", "text")
 
-	token := ast.OrdChoice("xx", nil, image, url, text)
+	token := ast.OrdChoice("token", nil, image, url, text)
 	rest := ast.ManyUntil("rest", nil, token, end)
 
 	// [text+]

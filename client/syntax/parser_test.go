@@ -12,6 +12,7 @@ var (
 )
 
 func TestParse__indent_node(t *testing.T) {
+	t.SkipNow()
 	for _, fixture := range []struct {
 		original string
 		indent   []int
@@ -193,6 +194,7 @@ func TestParse__table_directive_node(t *testing.T) {
 }
 
 func TestParse__image_node(t *testing.T) {
+	//t.SkipNow()
 	for _, fixture := range []struct {
 		original string
 		indent   []int
@@ -223,7 +225,17 @@ func TestParse__image_node(t *testing.T) {
 			[][]string{
 				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
 				{"https://avatars1.githubusercontent.com/u/1678258#.jpg"},
-				{"https://avatars1.githubusercontent.com/u/1678258#.gif"},
+				{"xxx", "https://avatars1.githubusercontent.com/u/1678258#.gif"},
+			},
+		},
+		{"https://gyazo.com/1678258/avatar1\n" +
+			"   https://gyazo.com/1678258/avatar2\n" +
+			"\t\t\thttps://gyazo.com/1678258/avatar3",
+			[]int{0, 3, 3},
+			[][]string{
+				{"https://gyazo.com/1678258/avatar1"},
+				{"https://gyazo.com/1678258/avatar2"},
+				{"https://gyazo.com/1678258/avatar3"},
 			},
 		},
 	} {
