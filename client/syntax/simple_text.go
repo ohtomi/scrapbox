@@ -10,7 +10,7 @@ type SimpleText struct {
 	parsec.NonTerminal
 }
 
-func NewSimpleText(node parsec.Queryable) *SimpleText {
+func NewSimpleText(node parsec.Queryable, name string) *SimpleText {
 	indent := node.GetChildren()[0]
 	attributes := map[string][]string{}
 	if indent.GetName() == "ws" {
@@ -22,5 +22,5 @@ func NewSimpleText(node parsec.Queryable) *SimpleText {
 	rest := node.GetChildren()[2]
 	children := rest.GetChildren()
 
-	return &SimpleText{parsec.NonTerminal{Name: "simple_text", Children: children, Attributes: attributes}}
+	return &SimpleText{parsec.NonTerminal{Name: name, Children: children, Attributes: attributes}}
 }

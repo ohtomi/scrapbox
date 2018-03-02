@@ -57,13 +57,13 @@ func NewAST() AST {
 
 		switch body.GetName() {
 		case "quoted":
-			return NewQuotedText(tokens)
+			return NewSimpleText(tokens, "quoted_text")
 		case "code":
-			return NewCodeBlock(tokens)
+			return NewSimpleText(tokens, "code_block")
 		case "table":
-			return NewTableBlock(tokens)
+			return NewSimpleText(tokens, "table_block")
 		default:
-			return NewSimpleText(tokens)
+			return NewSimpleText(tokens, "simple_text")
 		}
 	}
 
