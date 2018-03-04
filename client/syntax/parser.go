@@ -2,6 +2,7 @@ package syntax
 
 import (
 	"github.com/prataprc/goparsec"
+	"fmt"
 )
 
 type AST struct {
@@ -52,19 +53,32 @@ func NewAST() AST {
 
 	callback := func(name string, s parsec.Scanner, node parsec.Queryable) parsec.Queryable {
 		tokens := node.GetChildren()[0]
-		children := tokens.GetChildren()
-		body := children[1]
 
-		switch body.GetName() {
-		case "quoted":
-			return NewSimpleText(tokens, "quoted_text")
-		case "code":
-			return NewSimpleText(tokens, "code_block")
-		case "table":
-			return NewSimpleText(tokens, "table_block")
-		default:
-			return NewSimpleText(tokens, "simple_text")
+		indent := tokens.GetChildren()[0]
+		attributes := map[string][]string{}
+		if indent.GetName() == "ws" {
+			attributes["indent"] = []string{fmt.Sprintf("%d", len(indent.GetValue()))}
+		} else if indent.GetName() == "missing" {
+			attributes["indent"] = []string{fmt.Sprintf("%d", 0)}
 		}
+
+		head := tokens.GetChildren()[1]
+		var newName string
+		switch head.GetName() {
+		case "quoted":
+			newName = "quoted_text"
+		case "code":
+			newName = "code_block"
+		case "table":
+			newName = "table_block"
+		default:
+			newName = "simple_text"
+		}
+
+		rest := tokens.GetChildren()[2]
+		children := rest.GetChildren()
+
+		return &parsec.NonTerminal{Name: newName, Children: children, Attributes: attributes}
 	}
 
 	tokens := ast.And("tokens", nil, indent, head, rest)
