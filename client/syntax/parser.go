@@ -1,8 +1,9 @@
 package syntax
 
 import (
-	"github.com/prataprc/goparsec"
 	"fmt"
+
+	"github.com/prataprc/goparsec"
 )
 
 type AST struct {
@@ -52,9 +53,7 @@ func NewAST() AST {
 	// `text+`
 
 	callback := func(name string, s parsec.Scanner, node parsec.Queryable) parsec.Queryable {
-		tokens := node.GetChildren()[0]
-
-		indent := tokens.GetChildren()[0]
+		indent := node.GetChildren()[0]
 		attributes := map[string][]string{}
 		if indent.GetName() == "ws" {
 			attributes["indent"] = []string{fmt.Sprintf("%d", len(indent.GetValue()))}
@@ -62,7 +61,7 @@ func NewAST() AST {
 			attributes["indent"] = []string{fmt.Sprintf("%d", 0)}
 		}
 
-		head := tokens.GetChildren()[1]
+		head := node.GetChildren()[1]
 		var newName string
 		switch head.GetName() {
 		case "quoted":
@@ -75,14 +74,13 @@ func NewAST() AST {
 			newName = "simple_text"
 		}
 
-		rest := tokens.GetChildren()[2]
+		rest := node.GetChildren()[2]
 		children := rest.GetChildren()
 
 		return &parsec.NonTerminal{Name: newName, Children: children, Attributes: attributes}
 	}
 
-	tokens := ast.And("tokens", nil, indent, head, rest)
-	line := ast.ManyUntil("line", callback, tokens, end)
+	line := ast.And("line", callback, indent, head, rest)
 	root := ast.ManyUntil("root", nil, line, lf, end)
 
 	return AST{ast: ast, parser: root}
