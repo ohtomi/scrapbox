@@ -225,7 +225,7 @@ func TestParse__image_node(t *testing.T) {
 			[][]string{
 				{"https://avatars1.githubusercontent.com/u/1678258#.png"},
 				{"https://avatars1.githubusercontent.com/u/1678258#.jpg"},
-				{"xxx", "https://avatars1.githubusercontent.com/u/1678258#.gif"},
+				{"https://avatars1.githubusercontent.com/u/1678258#.gif"},
 			},
 		},
 		{"https://gyazo.com/1678258/avatar1\n" +

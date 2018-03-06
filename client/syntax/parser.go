@@ -33,7 +33,7 @@ func NewAST() AST {
 	text := parsec.Token("[^\n]+", "text")
 
 	token := ast.OrdChoice("token", nil, image, url, text)
-	rest := ast.ManyUntil("rest", nil, token, end)
+	rest := ast.ManyUntil("rest", nil, token, lf)
 
 	// [text+]
 	// [url]
