@@ -316,6 +316,62 @@ func TestParse__url_node(t *testing.T) {
 	}
 }
 
+func TestParse__tag_node(t *testing.T) {
+	for _, fixture := range []struct {
+		original string
+		indent   []int
+		expected [][]string
+	}{
+		{"#github.com/ohtomi/scrapbox",
+			[]int{0},
+			[][]string{
+				{"#github.com/ohtomi/scrapbox"},
+			},
+		},
+		{"   #github.com/ohtomi/scrapbox",
+			[]int{3},
+			[][]string{
+				{"#github.com/ohtomi/scrapbox"},
+			},
+		},
+		{"\t\t\t#github.com/ohtomi/scrapbox",
+			[]int{3},
+			[][]string{
+				{"#github.com/ohtomi/scrapbox"},
+			},
+		},
+		{"#github.com/ohtomi/scrapbox/1\n" +
+			"   #github.com/ohtomi/scrapbox/2\n" +
+			"\t\t\t#github.com/ohtomi/scrapbox/3",
+			[]int{0, 3, 3},
+			[][]string{
+				{"#github.com/ohtomi/scrapbox/1"},
+				{"#github.com/ohtomi/scrapbox/2"},
+				{"#github.com/ohtomi/scrapbox/3"},
+			},
+		},
+	} {
+		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
+
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+		if len(queryable.GetChildren()) != len(fixture.expected) {
+			t.Fatalf("Found %d, but Want %d: %+v", len(queryable.GetChildren()), len(fixture.expected), queryable)
+		}
+
+		for i, node := range queryable.GetChildren() {
+			assertEqualTo(t, node.GetName(), "simple_text")
+			assertEqualTo(t, node.GetAttribute("indent"), []string{fmt.Sprintf("%d", fixture.indent[i])})
+
+			for j, expected := range fixture.expected[i] {
+				assertEqualTo(t, node.GetChildren()[j].GetName(), "tag")
+				assertEqualTo(t, node.GetChildren()[j].GetValue(), expected)
+			}
+		}
+	}
+}
+
 func TestParse__text_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string

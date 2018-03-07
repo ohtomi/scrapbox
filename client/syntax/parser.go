@@ -30,9 +30,10 @@ func NewAST() AST {
 
 	image := parsec.Token("(https://gyazo.com/[^ \t\n]+)|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg)", "image")
 	url := parsec.Token("https?://[^ \t\n]+", "url")
+	tag := parsec.Token("#[^ \t\n]+", "tag")
 	text := parsec.Token("[^\n]+", "text")
 
-	token := ast.OrdChoice("token", nil, image, url, text)
+	token := ast.OrdChoice("token", nil, image, url, tag, text)
 	rest := ast.ManyUntil("rest", nil, token, lf)
 
 	// [text+]
@@ -48,7 +49,7 @@ func NewAST() AST {
 	// [[image]]
 	// [[*/-_]+ text]
 	// [$ text]
-	// #text
+	// #text -> tag
 	// #[text+]
 	// `text+`
 
