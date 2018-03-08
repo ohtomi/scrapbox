@@ -348,6 +348,16 @@ func TestParse__tag_node(t *testing.T) {
 				{"#github.com/ohtomi/scrapbox/3"},
 			},
 		},
+		{"#[github.com/ohtomi/scrapbox/1]\n" +
+			"   #[ github.com/ohtomi/scrapbox/2 ]\n" +
+			"\t\t\t#[github.com /ohtomi/ scrapbox/3]",
+			[]int{0, 3, 3},
+			[][]string{
+				{"#[github.com/ohtomi/scrapbox/1]"},
+				{"#[ github.com/ohtomi/scrapbox/2 ]"},
+				{"#[github.com /ohtomi/ scrapbox/3]"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
