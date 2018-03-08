@@ -12,7 +12,6 @@ var (
 )
 
 func TestParse__indent_node(t *testing.T) {
-	t.SkipNow()
 	for _, fixture := range []struct {
 		original string
 		indent   []int
@@ -194,7 +193,6 @@ func TestParse__table_directive_node(t *testing.T) {
 }
 
 func TestParse__image_node(t *testing.T) {
-	//t.SkipNow()
 	for _, fixture := range []struct {
 		original string
 		indent   []int
