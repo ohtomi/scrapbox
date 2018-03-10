@@ -32,8 +32,9 @@ func NewAST() AST {
 	url := parsec.Token("https?://[^ \t\n]+", "url")
 	tag := parsec.Token("#(\\[[^[\n]+\\]|[^ \t\n]+)", "tag")
 	text := parsec.Token("[^\n]+", "text")
+	bold := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
 
-	token := ast.OrdChoice("token", nil, image, url, tag, text)
+	token := ast.OrdChoice("token", nil, image, url, bold, tag, text)
 	rest := ast.Kleene("rest", nil, token)
 
 	// [text+]
