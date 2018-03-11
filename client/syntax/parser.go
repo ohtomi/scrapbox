@@ -32,7 +32,11 @@ func NewAST() AST {
 	url := parsec.Token("https?://[^ \t\n]+", "url")
 	tag := parsec.Token("#(\\[[^[\n]+\\]|[^ \t\n]+)", "tag")
 	text := parsec.Token("[^\n]+", "text")
-	bold := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
+
+	bold_image := parsec.Token("\\[\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))?\\]\\]", "bold")
+	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
+	//bold := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
+	bold := ast.OrdChoice("bold", nil, bold_image, bold_text)
 
 	token := ast.OrdChoice("token", nil, image, url, bold, tag, text)
 	rest := ast.Kleene("rest", nil, token)
@@ -46,12 +50,12 @@ func NewAST() AST {
 	// [/text(/text)*]
 	// [text.icon]
 	// [/text(/text)*.icon]
-	// [[text]]
-	// [[image]]
+	// [[text]]					-> bold_text
+	// [[image]]				-> bold_image
 	// [[*/-_]+ text]
 	// [$ text]
-	// #text -> tag
-	// #[text+] -> tag
+	// #text 					-> tag
+	// #[text+] 				-> tag
 	// `text+`
 
 	callback := func(name string, s parsec.Scanner, node parsec.Queryable) parsec.Queryable {
