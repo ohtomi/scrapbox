@@ -28,6 +28,9 @@ func NewAST() AST {
 	mark := ast.OrdChoice("mark", nil, quoted, code, table)
 	head := ast.Maybe("head", nil, mark)
 
+	project_link := parsec.Token("\\[[^[\n]*?\\]", "link")
+	link := ast.OrdChoice("link", nil, project_link)
+
 	image := parsec.Token("(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))", "image")
 	url := parsec.Token("https?://[^ \t\n]+", "url")
 	tag := parsec.Token("#(\\[[^[\n]+\\]|[^ \t\n]+)", "tag")
@@ -35,10 +38,9 @@ func NewAST() AST {
 
 	bold_image := parsec.Token("\\[\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))?\\]\\]", "bold")
 	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
-	//bold := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
 	bold := ast.OrdChoice("bold", nil, bold_image, bold_text)
 
-	token := ast.OrdChoice("token", nil, image, url, bold, tag, text)
+	token := ast.OrdChoice("token", nil, link, image, url, bold, tag, text)
 	rest := ast.Kleene("rest", nil, token)
 
 	// [text+]
