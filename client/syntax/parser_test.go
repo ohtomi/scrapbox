@@ -236,10 +236,10 @@ func TestParse__link_node(t *testing.T) {
 				{"[github.com /ohtomi/ scrapbox/3]"},
 			},
 		},
-		{"[https://avatars1.githubusercontent.com/u/1678258#.png]",
+		{"[https://avatars1.githubusercontent.com/u/1678258]",
 			[]int{0},
 			[][]string{
-				{"[https://avatars1.githubusercontent.com/u/1678258#.png]"},
+				{"[https://avatars1.githubusercontent.com/u/1678258]"},
 			},
 		},
 	} {
