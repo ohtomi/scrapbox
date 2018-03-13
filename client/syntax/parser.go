@@ -28,9 +28,11 @@ func NewAST() AST {
 	mark := ast.OrdChoice("mark", nil, quoted, code, table)
 	head := ast.Maybe("head", nil, mark)
 
+	labeled_link1 := parsec.Token("\\[[^[\n]+[ \t]+https?://[^ \t\n]+\\]", "link")
+	labeled_link2 := parsec.Token("\\[https?://[^ \t\n]+[ \t]+[^[\n]+\\]", "link")
 	external_link := parsec.Token("\\[https?://[^[ \t\n]+\\]", "link")
 	project_link := parsec.Token("\\[[^[\n]*?\\]", "link")
-	link := ast.OrdChoice("link", nil, external_link, project_link)
+	link := ast.OrdChoice("link", nil, labeled_link1, labeled_link2, external_link, project_link)
 
 	image := parsec.Token("(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))", "image")
 	url := parsec.Token("https?://[^ \t\n]+", "url")
@@ -46,8 +48,8 @@ func NewAST() AST {
 
 	// [text+]					-> project_link
 	// [url]					-> external_link
-	// [text url]
-	// [url text]
+	// [text url]				-> labeled_link1
+	// [url text]				-> labeled_link2
 	// [image url]
 	// [url image]
 	// [/text(/text)*]
