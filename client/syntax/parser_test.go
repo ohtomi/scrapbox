@@ -266,6 +266,12 @@ func TestParse__link_node(t *testing.T) {
 				{"[https://avatars1.githubusercontent.com/u/1678258 https://avatars1.githubusercontent.com/u/1678258#.png]"},
 			},
 		},
+		{"[/foo/bar/baz]",
+			[]int{0},
+			[][]string{
+				{"[/foo/bar/baz]"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
