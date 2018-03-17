@@ -532,6 +532,12 @@ func TestParse__bold_node(t *testing.T) {
 				{"[[https://avatars1.githubusercontent.com/u/1678258#.png]]"},
 			},
 		},
+		{"[[_-/*/-_ github.com/ohtomi/scrapbox]]",
+			[]int{0},
+			[][]string{
+				{"[[_-/*/-_ github.com/ohtomi/scrapbox]]"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
