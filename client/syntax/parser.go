@@ -42,10 +42,11 @@ func NewAST() AST {
 	tag := parsec.Token("#(\\[[^[\n]+\\]|[^ \t\n]+)", "tag")
 	text := parsec.Token("[^\n]+", "text")
 
+	bold_styled_url := parsec.Token("\\[\\[[*/\\-_]+[ \t]+https?://[^ \t\n]*?\\]\\]", "bold")
 	bold_styled_text := parsec.Token("\\[\\[[*/\\-_]+[ \t]+[^\n]*?\\]\\]", "bold")
 	bold_image := parsec.Token("\\[\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))?\\]\\]", "bold")
 	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
-	bold := ast.OrdChoice("bold", nil, bold_styled_text, bold_image, bold_text)
+	bold := ast.OrdChoice("bold", nil, bold_styled_url, bold_styled_text, bold_image, bold_text)
 
 	token := ast.OrdChoice("token", nil, link, image, url, bold, tag, text)
 	rest := ast.Kleene("rest", nil, token)
@@ -61,6 +62,7 @@ func NewAST() AST {
 	// [/text(/text)*.icon]
 	// [[text]]					-> bold_text
 	// [[image]]				-> bold_image
+	// [[*/-_]+ url]
 	// [[*/-_]+ text]			-> bold_styled_text
 	// [$ text]
 	// #text 					-> tag
