@@ -272,6 +272,18 @@ func TestParse__link_node(t *testing.T) {
 				{"[/foo/bar/baz]"},
 			},
 		},
+		{"[_-/*/-_ https://avatars1.githubusercontent.com/u/1678258#.png]",
+			[]int{0},
+			[][]string{
+				{"[_-/*/-_ https://avatars1.githubusercontent.com/u/1678258#.png]"},
+			},
+		},
+		{"[_-/*/-_ github.com/ohtomi/scrapbox]",
+			[]int{0},
+			[][]string{
+				{"[_-/*/-_ github.com/ohtomi/scrapbox]"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
@@ -530,18 +542,6 @@ func TestParse__bold_node(t *testing.T) {
 			[]int{0},
 			[][]string{
 				{"[[https://avatars1.githubusercontent.com/u/1678258#.png]]"},
-			},
-		},
-		{"[_-/*/-_ https://avatars1.githubusercontent.com/u/1678258#.png]",
-			[]int{0},
-			[][]string{
-				{"[_-/*/-_ https://avatars1.githubusercontent.com/u/1678258#.png]"},
-			},
-		},
-		{"[_-/*/-_ github.com/ohtomi/scrapbox]",
-			[]int{0},
-			[][]string{
-				{"[_-/*/-_ github.com/ohtomi/scrapbox]"},
 			},
 		},
 	} {
