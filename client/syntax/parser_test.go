@@ -284,6 +284,12 @@ func TestParse__link_node(t *testing.T) {
 				{"[_-/*/-_ github.com/ohtomi/scrapbox]"},
 			},
 		},
+		{"[$ 1+2 = 3]",
+			[]int{0},
+			[][]string{
+				{"[$ 1+2 = 3]"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
