@@ -290,6 +290,12 @@ func TestParse__link_node(t *testing.T) {
 				{"[$ 1+2 = 3]"},
 			},
 		},
+		{"[ user.icon]",
+			[]int{0},
+			[][]string{
+				{"[ user.icon]"},
+			},
+		},
 	} {
 		queryable := Parse([]byte(fixture.original), enablePrettyPrint)
 
