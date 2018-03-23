@@ -11,6 +11,35 @@ var (
 	enablePrettyPrint = os.Getenv("SCRAPBOX_DEBUG") != ""
 )
 
+func TestParse__single_node(t *testing.T) {
+	for _, fixture := range []struct {
+		source string
+		name   string
+		value  string
+	}{
+		{"xxx", "text", "xxx"},
+	} {
+		queryable := Parse([]byte(fixture.source), enablePrettyPrint)
+
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+
+		if len(queryable.GetChildren()) > 1 {
+			t.Fatalf("%d root children found", len(queryable.GetChildren()))
+		}
+		node := queryable.GetChildren()[0]
+
+		if len(node.GetChildren()) > 1 {
+			t.Fatalf("%d children found", len(node.GetChildren()))
+		}
+		item := node.GetChildren()[0]
+
+		assertEqualTo(t, item.GetName(), fixture.name)
+		assertEqualTo(t, item.GetValue(), fixture.value)
+	}
+}
+
 func TestParse__indent_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
