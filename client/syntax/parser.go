@@ -28,25 +28,47 @@ func NewAST() AST {
 	mark := ast.OrdChoice("mark", nil, quoted, code, table)
 	head := ast.Maybe("head", nil, mark)
 
+	// [$ text]
 	math := parsec.Token("\\[\\$[ \t]+[^\n]*?\\]", "link")
+	// [[*/-_]+ url]
 	styled_url := parsec.Token("\\[[*/\\-_]+[ \t]+https?://[^ \t\n]*?\\]", "link")
+	// [[*/-_]+ text]
 	styled_text := parsec.Token("\\[[*/\\-_]+[ \t]+[^\n]*?\\]", "link")
+	// [/text(/text)*]
 	project_link := parsec.Token("\\[(/[^/ \n]+)+\\]", "link")
+	// [image url]
 	image_link1 := parsec.Token("\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))[ \t]+https?://[^ \t\n]+\\]", "link")
+	// [url image]
 	image_link2 := parsec.Token("\\[https?://[^ \t\n]+[ \t]+(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))\\]", "link")
+	// [text url]
 	labeled_link1 := parsec.Token("\\[[^[\n]+[ \t]+https?://[^ \t\n]+\\]", "link")
+	// [url text]
 	labeled_link2 := parsec.Token("\\[https?://[^ \t\n]+[ \t]+[^[\n]+\\]", "link")
+	// [url]
 	external_link := parsec.Token("\\[https?://[^[ \t\n]+\\]", "link")
+	// [text.icon]
 	icon := parsec.Token("\\[[^\n]+\\.icon\\]", "link")
+	// [/text(/text)*.icon]
+	// TODO
+	// [text+]
 	internal_link := parsec.Token("\\[[^[\n]*?\\]", "link")
 
+	//
 	image := parsec.Token("(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))", "image")
+	//
 	url := parsec.Token("https?://[^ \t\n]+", "url")
+	// #[text( text)*] | #text
 	tag := parsec.Token("#(\\[[^[\n]+\\]|[^ \t\n]+)", "tag")
+	//
 	text := parsec.Token("[^\n]+", "text")
 
+	// [[image]]
 	bold_image := parsec.Token("\\[\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))?\\]\\]", "bold")
+	// [[text]]
 	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
+
+	// `text+`
+	// TODO
 
 	token := ast.OrdChoice("token", nil,
 		math,
@@ -67,24 +89,6 @@ func NewAST() AST {
 		tag,
 		text)
 	rest := ast.Kleene("rest", nil, token)
-
-	// [text+]					-> internal_link
-	// [url]					-> external_link
-	// [text url]				-> labeled_link1
-	// [url text]				-> labeled_link2
-	// [image url]				-> image_link1
-	// [url image]				-> image_link2
-	// [/text(/text)*]			-> project_link
-	// [text.icon]				-> icon
-	// [/text(/text)*.icon]
-	// [[text]]					-> bold_text
-	// [[image]]				-> bold_image
-	// [[*/-_]+ url]			-> styled_url
-	// [[*/-_]+ text]			-> styled_text
-	// [$ text]					-> math
-	// #text 					-> tag
-	// #[text+] 				-> tag
-	// `text+`
 
 	callback := func(name string, s parsec.Scanner, node parsec.Queryable) parsec.Queryable {
 		indent := node.GetChildren()[0]
