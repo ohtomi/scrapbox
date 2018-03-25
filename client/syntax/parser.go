@@ -39,7 +39,6 @@ func NewAST() AST {
 	external_link := parsec.Token("\\[https?://[^[ \t\n]+\\]", "link")
 	icon := parsec.Token("\\[[^\n]+\\.icon\\]", "link")
 	internal_link := parsec.Token("\\[[^[\n]*?\\]", "link")
-	link := ast.OrdChoice("link", nil, math, styled_url, styled_text, project_link, image_link1, image_link2, labeled_link1, labeled_link2, external_link, icon, internal_link)
 
 	image := parsec.Token("(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))", "image")
 	url := parsec.Token("https?://[^ \t\n]+", "url")
@@ -48,9 +47,25 @@ func NewAST() AST {
 
 	bold_image := parsec.Token("\\[\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))?\\]\\]", "bold")
 	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
-	bold := ast.OrdChoice("bold", nil, bold_image, bold_text)
 
-	token := ast.OrdChoice("token", nil, link, image, url, bold, tag, text)
+	token := ast.OrdChoice("token", nil,
+		math,
+		styled_url,
+		styled_text,
+		project_link,
+		image_link1,
+		image_link2,
+		labeled_link1,
+		labeled_link2,
+		external_link,
+		icon,
+		internal_link,
+		image,
+		url,
+		bold_image,
+		bold_text,
+		tag,
+		text)
 	rest := ast.Kleene("rest", nil, token)
 
 	// [text+]					-> internal_link
