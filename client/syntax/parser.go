@@ -52,23 +52,20 @@ func NewAST() AST {
 	// TODO
 	// [text+]
 	internal_link := parsec.Token("\\[[^[\n]*?\\]", "link")
-
-	//
+	// image
 	image := parsec.Token("(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))", "image")
-	//
+	// url
 	url := parsec.Token("https?://[^ \t\n]+", "url")
-	// #[text( text)*] | #text
-	tag := parsec.Token("#(\\[[^[\n]+\\]|[^ \t\n]+)", "tag")
-	//
-	text := parsec.Token("[^\n]+", "text")
-
 	// [[image]]
 	bold_image := parsec.Token("\\[\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))?\\]\\]", "bold")
 	// [[text]]
 	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
-
 	// `text+`
 	// TODO
+	// #[text( text)*] | #text
+	tag := parsec.Token("#(\\[[^[\n]+\\]|[^ \t\n]+)", "tag")
+	// text
+	text := parsec.Token("[^\n]+", "text")
 
 	token := ast.OrdChoice("token", nil,
 		math,
