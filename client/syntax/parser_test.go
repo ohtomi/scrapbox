@@ -53,6 +53,7 @@ func TestParse__single_node(t *testing.T) {
 		{"[https://avatars1.githubusercontent.com/u/1678258 avatar]", "link", "[https://avatars1.githubusercontent.com/u/1678258 avatar]"},
 		{"[https://avatars1.githubusercontent.com/u/1678258]", "link", "[https://avatars1.githubusercontent.com/u/1678258]"},
 		{"[ user.icon]", "link", "[ user.icon]"},
+		{"[/foo/bar/baz .icon]", "link", "[/foo/bar/baz .icon]"},
 		{"[github.com/ohtomi/scrapbox]", "link", "[github.com/ohtomi/scrapbox]"},
 		// image
 		{"http://avatars1.githubusercontent.com/u/1678258#.png", "image", "http://avatars1.githubusercontent.com/u/1678258#.png"},

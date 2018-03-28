@@ -49,7 +49,7 @@ func NewAST() AST {
 	// [text.icon]
 	icon := parsec.Token("\\[[^\n]+\\.icon\\]", "link")
 	// [/text(/text)*.icon]
-	// TODO
+	page_icon := parsec.Token("\\[(/[^\n])+\\.icon\\]", "link")
 	// [text+]
 	internal_link := parsec.Token("\\[[^[\n]*?\\]", "link")
 	// image
@@ -78,6 +78,7 @@ func NewAST() AST {
 		labeled_link2,
 		external_link,
 		icon,
+		page_icon,
 		internal_link,
 		image,
 		url,
