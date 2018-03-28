@@ -67,6 +67,8 @@ func TestParse__single_node(t *testing.T) {
 		{"[[http://avatars1.githubusercontent.com/u/1678258#.png]]", "bold", "[[http://avatars1.githubusercontent.com/u/1678258#.png]]"},
 		{"[[github.com/ohtomi/scrapbox]]", "bold", "[[github.com/ohtomi/scrapbox]]"},
 		{"[[ github.com\t/ohtomi/\tscrapbox ]]", "bold", "[[ github.com\t/ohtomi/\tscrapbox ]]"},
+		// snippet
+		{"`github.com\t/ohtomi/\tscrapbox/`", "snippet", "`github.com\t/ohtomi/\tscrapbox/`"},
 		// tag
 		{"#[github.com/ohtomi/scrapbox/]", "tag", "#[github.com/ohtomi/scrapbox/]"},
 		{"#[ github.com\t/ohtomi/\tscrapbox/ ]", "tag", "#[ github.com\t/ohtomi/\tscrapbox/ ]"},

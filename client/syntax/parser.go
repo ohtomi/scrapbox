@@ -61,7 +61,7 @@ func NewAST() AST {
 	// [[text]]
 	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
 	// `text+`
-	// TODO
+	snippet := parsec.Token("`[^`]*?`", "snippet")
 	// #[text( text)*] | #text
 	tag := parsec.Token("#(\\[[^[\n]+\\]|[^ \t\n]+)", "tag")
 	// text
@@ -83,6 +83,7 @@ func NewAST() AST {
 		url,
 		bold_image,
 		bold_text,
+		snippet,
 		tag,
 		text)
 	rest := ast.Kleene("rest", nil, token)
