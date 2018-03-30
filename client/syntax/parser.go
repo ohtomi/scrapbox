@@ -29,29 +29,29 @@ func NewAST() AST {
 	head := ast.Maybe("head", nil, mark)
 
 	// [$ text]
-	math := parsec.Token("\\[\\$[ \t]+[^\n]*?\\]", "link")
+	math := parsec.Token("\\[\\$[ \t]+[^\n]*?\\]", "math")
 	// [[*/-_]+ url]
-	styled_url := parsec.Token("\\[[*/\\-_]+[ \t]+https?://[^ \t\n]*?\\]", "link")
+	styled_url := parsec.Token("\\[[*/\\-_]+[ \t]+https?://[^ \t\n]*?\\]", "styled_url")
 	// [[*/-_]+ text]
-	styled_text := parsec.Token("\\[[*/\\-_]+[ \t]+[^\n]*?\\]", "link")
+	styled_text := parsec.Token("\\[[*/\\-_]+[ \t]+[^\n]*?\\]", "styled_text")
 	// [/text(/text)*]
-	project_link := parsec.Token("\\[(/[^/ \n]+)+\\]", "link")
+	project_link := parsec.Token("\\[(/[^/ \n]+)+\\]", "project_link")
 	// [image url]
-	image_link1 := parsec.Token("\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))[ \t]+https?://[^ \t\n]+\\]", "link")
+	image_link1 := parsec.Token("\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))[ \t]+https?://[^ \t\n]+\\]", "image_link1")
 	// [url image]
-	image_link2 := parsec.Token("\\[https?://[^ \t\n]+[ \t]+(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))\\]", "link")
+	image_link2 := parsec.Token("\\[https?://[^ \t\n]+[ \t]+(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))\\]", "image_link2")
 	// [text url]
-	labeled_link1 := parsec.Token("\\[[^[\n]+[ \t]+https?://[^ \t\n]+\\]", "link")
+	labeled_link1 := parsec.Token("\\[[^[\n]+[ \t]+https?://[^ \t\n]+\\]", "labeled_link1")
 	// [url text]
-	labeled_link2 := parsec.Token("\\[https?://[^ \t\n]+[ \t]+[^[\n]+\\]", "link")
+	labeled_link2 := parsec.Token("\\[https?://[^ \t\n]+[ \t]+[^[\n]+\\]", "labeled_link2")
 	// [url]
-	external_link := parsec.Token("\\[https?://[^[ \t\n]+\\]", "link")
-	// [text.icon]
-	icon := parsec.Token("\\[[^\n]+\\.icon\\]", "link")
+	external_link := parsec.Token("\\[https?://[^[ \t\n]+\\]", "external_link")
 	// [/text(/text)*.icon]
-	page_icon := parsec.Token("\\[(/[^\n])+\\.icon\\]", "link")
+	page_icon := parsec.Token("\\[(/[^\n]+)+\\.icon\\]", "page_icon")
+	// [text.icon]
+	icon := parsec.Token("\\[[^\n]+\\.icon\\]", "icon")
 	// [text+]
-	internal_link := parsec.Token("\\[[^[\n]*?\\]", "link")
+	internal_link := parsec.Token("\\[[^[\n]*?\\]", "internal_link")
 	// image
 	image := parsec.Token("(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))", "image")
 	// url
@@ -77,8 +77,8 @@ func NewAST() AST {
 		labeled_link1,
 		labeled_link2,
 		external_link,
-		icon,
 		page_icon,
+		icon,
 		internal_link,
 		image,
 		url,
