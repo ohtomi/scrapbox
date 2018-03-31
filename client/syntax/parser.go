@@ -57,9 +57,9 @@ func NewAST() AST {
 	// url
 	url := parsec.Token("https?://[^ \t\n]+", "url")
 	// [[image]]
-	bold_image := parsec.Token("\\[\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))?\\]\\]", "bold")
+	bold_image := parsec.Token("\\[\\[(https://gyazo.com/[^ \t\n]+|https?://[^ \t\n]+(\\.png|\\.gif|\\.jpg|\\.jpeg))?\\]\\]", "bold_image")
 	// [[text]]
-	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold")
+	bold_text := parsec.Token("\\[\\[[^\n]*?\\]\\]", "bold_text")
 	// `text+`
 	snippet := parsec.Token("`[^`]*?`", "snippet")
 	// #[text( text)*] | #text
