@@ -98,6 +98,40 @@ func TestParse__single_node(t *testing.T) {
 	}
 }
 
+func TestParse__many_nodes(t *testing.T) {
+	for _, fixture := range []struct {
+		source string
+		names  []string
+		values []string
+	}{
+		{
+			"[$ 1+2 = 3][_-/*/-_ https://avatars1.githubusercontent.com/u/1678258#.png]",
+			[]string{"math", "styled_url"},
+			[]string{"[$ 1+2 = 3]", "[_-/*/-_ https://avatars1.githubusercontent.com/u/1678258#.png]"},
+		},
+	} {
+		queryable := Parse([]byte(fixture.source), enablePrettyPrint)
+
+		if queryable == nil {
+			t.Fatalf("Failed to parse")
+		}
+
+		if len(queryable.GetChildren()) > 1 {
+			t.Fatalf("%d root children found", len(queryable.GetChildren()))
+		}
+		node := queryable.GetChildren()[0]
+
+		if len(node.GetChildren()) != len(fixture.names) {
+			t.Fatalf("%d children found", len(node.GetChildren()))
+		}
+
+		for i, item := range node.GetChildren() {
+			assertEqualTo(t, item.GetName(), fixture.names[i])
+			assertEqualTo(t, item.GetValue(), fixture.values[i])
+		}
+	}
+}
+
 func TestParse__quoted_node(t *testing.T) {
 	for _, fixture := range []struct {
 		original string
