@@ -57,7 +57,12 @@
 
 [[projects]]
   name = "github.com/posener/complete"
-  packages = [".","cmd","cmd/install","match"]
+  packages = [
+    ".",
+    "cmd",
+    "cmd/install",
+    "match"
+  ]
   revision = "dc2bc5a81accba8782bebea28628224643a8286a"
   version = "v1.1"
 
@@ -76,6 +81,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "7d481d1805a8cdee1920a86e786c3f588df1c117223a991bd7c56642c7aff0c9"
+  inputs-digest = "e26a0330457dbde1bfa9d79bfa6e24e3e6c5b2ae97dfbd94986947e9a50f6745"
   solver-name = "gps-cdcl"
   solver-version = 1
